@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  aobaspace-api:
+    build:
+      context: ./aobaspace-api
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./aobaspace-api:/app
+      - /app/node_modules # Exclude node_modules from host bind to prevent issues
+    env_file:
+      - ./aobaspace-api/.env
+    depends_on:
+      - postgres
+    networks:
+      - aobaspace-network
+
+  aobaspace-web:
+    build:
+      context: ./aobaspace-web
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3000" # Frontend runs on port 3000 inside container, map to 3001 on host
+    volumes:
+      - ./aobaspace-web:/app
+      - /app/node_modules # Exclude node_modules from host bind
+    env_file:
+      - ./aobaspace-web/.env
+    depends_on:
+      - aobaspace-api
+    networks:
+      - aobaspace-network
+
+  postgres:
+    image: postgres:14-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: aobaspace_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - aobaspace-network
+
+networks:
+  aobaspace-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
