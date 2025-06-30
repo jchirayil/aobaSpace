@@ -4,7 +4,7 @@
         "esbenp.prettier-vscode",
         "ms-azuretools.vscode-docker",
         "ms-kubernetes-tools.vscode-kubernetes-tools",
-        "ms-vscode.vscode-typescript-tslint-plugin",
+        //"ms-vscode.vscode-typescript-tslint-plugin",
         "nrwl.angular-console",
         "firsttris.vscode-jest-runner",
         "bradlc.vscode-tailwindcss",
