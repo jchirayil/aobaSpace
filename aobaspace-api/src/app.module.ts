@@ -11,7 +11,7 @@ import { DatabaseModule } from './database/database.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true, // Makes .env variables accessible throughout the app
-      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`, // Load specific .env file
+      envFilePath: '.env', // `.env.${process.env.NODE_ENV || 'development'}`, // Load specific .env file
     }),
     DatabaseModule, // Import the database module
     AuthModule,

@@ -7,9 +7,12 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
-    volumes:
-      - ./aobaspace-api:/app
-      - /app/node_modules # Exclude node_modules from host bind to prevent issues
+    # Removed volume mounts for application code to ensure Docker build artifacts are used
+    # volumes:
+    #   - ./aobaspace-api:/app
+    #   - /app/node_modules
+    environment:
+      - NODE_ENV=development
     env_file:
       - ./aobaspace-api/.env
     depends_on:
@@ -23,9 +26,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3001:3000" # Frontend runs on port 3000 inside container, map to 3001 on host
-    volumes:
-      - ./aobaspace-web:/app
-      - /app/node_modules # Exclude node_modules from host bind
+    # Removed volume mounts for application code to ensure Docker build artifacts are used
+    # volumes:
+    #   - ./aobaspace-web:/app
+    #   - /app/node_modules
     env_file:
       - ./aobaspace-web/.env
     depends_on:
@@ -46,6 +50,12 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - aobaspace-network
+    healthcheck: # Added healthcheck for postgres
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s # Give it some time to start initially
 
 networks:
   aobaspace-network:
@@ -53,3 +63,4 @@ networks:
 
 volumes:
   postgres_data:
+  
