@@ -9,7 +9,11 @@ import { User } from '../users/entities/user.entity'; // Import your entities he
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        url: configService.get<string>('DATABASE_URL'), // Get DATABASE_URL from .env
+        host: configService.get<string>('POSTGRES_HOST'), // CHANGED: Use explicit host
+        port: configService.get<number>('POSTGRES_PORT'), // CHANGED: Use explicit port
+        username: configService.get<string>('POSTGRES_USER'), // CHANGED: Use explicit username
+        password: configService.get<string>('POSTGRES_PASSWORD'), // CHANGED: Use explicit password
+        database: configService.get<string>('POSTGRES_DB'), // CHANGED: Use explicit database
         entities: [User], // List all your TypeORM entities here
         synchronize: true, // WARNING: set to false in production and use migrations
         logging: true, // Enable logging for development

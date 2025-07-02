@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   aobaspace-api:
     build:
@@ -13,12 +11,18 @@ services:
     #   - /app/node_modules
     environment:
       - NODE_ENV=development
+      - POSTGRES_HOST=postgres # NEW: Explicit host for TypeORM
+      - POSTGRES_PORT=5432     # NEW: Explicit port for TypeORM
+      - POSTGRES_USER=user     # NEW: Explicit user for TypeORM
+      - POSTGRES_PASSWORD=password # NEW: Explicit password for TypeORM
+      - POSTGRES_DB=aobaspace_db # NEW: Explicit database for TypeORM
     env_file:
       - ./aobaspace-api/.env
     depends_on:
       - postgres
     networks:
       - aobaspace-network
+    command: ["./wait-for-it.sh", "postgres:5432", "--", "node", "dist/main"]
 
   aobaspace-web:
     build:
