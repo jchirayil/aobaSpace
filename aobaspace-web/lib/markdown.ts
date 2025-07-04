@@ -8,9 +8,11 @@ const pagesDirectory = path.join(process.cwd(), 'content', 'pages');
 
 export function getAllPageSlugs() {
   const fileNames = fs.readdirSync(pagesDirectory);
-  return fileNames.map((fileName) => {
-    return fileName.replace(/\.md$/, '');
-  });
+  return fileNames
+    .filter(fileName => fileName.endsWith('.md')) // NEW: Filter for only .md files
+    .map((fileName) => {
+      return fileName.replace(/\.md$/, '');
+    });
 }
 
 export async function getPageContent(slug: string) {

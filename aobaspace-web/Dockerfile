@@ -3,12 +3,18 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# 1. Copy package.json and lock files first
 COPY package.json yarn.lock* pnpm-lock.yaml* ./
-# Use npm, yarn, or pnpm based on your preference
+
+# 2. Install dependencies based on the lock file
 RUN npm install --frozen-lockfile
 
+# 3. Copy the rest of your application code
+# This ensures that node_modules and .next from the host are NOT copied
+# which could cause conflicts with the fresh install in the container.
 COPY . .
 
+# 4. Run the build
 RUN npm run build
 
 # Stage 2: Run the Next.js application
@@ -18,16 +24,16 @@ WORKDIR /app
 
 ENV NODE_ENV production
 
-# Copy the entire standalone output from the builder stage.
-# This includes the Next.js server, node_modules, and the .next/static assets.
+# Copy the entire standalone output (server.js, node_modules)
 COPY --from=builder /app/.next/standalone ./
 
-# Copy the original public directory.
-# While standalone might include some public assets, copying the original ensures
-# all static assets (like favicon.ico, images, etc.) are present.
+# Corrected: Copy .next/static from the builder's .next directory
+COPY --from=builder /app/.next/static ./.next/static
+
+# Corrected: Copy public from the builder's root directory
 COPY --from=builder /app/public ./public
 
-# NEW: Copy the 'content' directory.
+# Copy the 'content' directory.
 # This is essential for your Markdown files to be accessible at runtime.
 COPY --from=builder /app/content ./content
 
