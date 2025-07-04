@@ -18,20 +18,20 @@ WORKDIR /app
 
 ENV NODE_ENV production
 
-# Copy the standalone output from the builder stage
-# The standalone output includes the server, .next, and node_modules
+# Copy the entire standalone output from the builder stage.
+# This includes the Next.js server, node_modules, and the .next/static assets.
 COPY --from=builder /app/.next/standalone ./
+
+# Copy the original public directory.
+# While standalone might include some public assets, copying the original ensures
+# all static assets (like favicon.ico, images, etc.) are present.
 COPY --from=builder /app/public ./public
 
-# Copy built application from builder stage
-# COPY --from=builder /app/.next ./.next
-# COPY --from=builder /app/node_modules ./node_modules
-# COPY --from=builder /app/package.json ./package.json
-# COPY --from=builder /app/public ./public
+# NEW: Copy the 'content' directory.
+# This is essential for your Markdown files to be accessible at runtime.
+COPY --from=builder /app/content ./content
 
 EXPOSE 3000
 
 # The standalone server is run via node server.js from its root.
 CMD ["node", "server.js"]
-
-# CMD ["npm", "start"]
