@@ -1,24 +1,19 @@
-'use client'; // This directive makes the component a Client Component in Next.js
+'use client';
 
 import React, { useState } from 'react';
+import { useAuth } from '@/context/AuthContext'; // Import useAuth hook
 
-// This is a placeholder component for demonstration.
-// In a real application, you would integrate with Auth0, Firebase, or your backend for authentication.
-
-const AuthButton: React.FC = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+const AuthButton = () => {
+  const { isLoggedIn, login, logout } = useAuth(); // Use the auth context
 
   const handleAuthClick = () => {
     if (isLoggedIn) {
-      // Simulate logout
       console.log('Logging out...');
-      setIsLoggedIn(false);
+      logout(); // Call logout from context
       alert('Logged out successfully!');
     } else {
-      // Simulate login
       console.log('Logging in...');
-      // In a real app, this would redirect to SSO provider or show login form
-      setIsLoggedIn(true);
+      login(); // Call login from context
       alert('Logged in successfully! (Simulated)');
     }
   };
