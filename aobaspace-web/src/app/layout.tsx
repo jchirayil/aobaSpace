@@ -19,11 +19,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className + " flex flex-col min-h-screen"}> {/* NEW: Added flex classes for sticky footer */}
+      <body className={inter.className + " flex flex-col min-h-screen"}>
         {/* Wrap the entire application with AuthProvider to make auth state available */}
         <AuthProvider>
           <Navbar /> {/* Include the Navbar at the top of your layout */}
-          <div className="flex-grow"> {/* NEW: This div ensures content pushes footer down */}
+          {/* Added pt-16 to push content down below the fixed Navbar */}
+          <div className="flex-grow pt-16">
             {children}
           </div>
           <Footer /> {/* NEW: Include the Footer at the bottom of your layout */}
