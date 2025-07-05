@@ -136,6 +136,28 @@ const Navbar = () => {
                     >
                       Dashboard
                     </Link>
+                    {/* New placeholder links for GitHub-like menu */}
+                    <Link
+                      href="/profile"
+                      className="block px-4 py-2 text-lg text-white hover:bg-gray-600"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      Profile
+                    </Link>
+                    <Link
+                      href="/settings"
+                      className="block px-4 py-2 text-lg text-white hover:bg-gray-600"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      Settings
+                    </Link>
+                    <Link
+                      href="/billing"
+                      className="block px-4 py-2 text-lg text-white hover:bg-gray-600"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      Billing
+                    </Link>
                     <div className="border-t border-gray-600 my-1"></div>
                     <button
                       onClick={handleAuthClick}
@@ -196,6 +218,28 @@ const Navbar = () => {
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Dashboard
+                  </Link>
+                  {/* New placeholder links for GitHub-like menu in mobile */}
+                  <Link
+                    href="/profile"
+                    className="block py-2 text-white hover:text-gray-300"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Profile
+                  </Link>
+                  <Link
+                    href="/settings"
+                    className="block py-2 text-white hover:text-gray-300"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Settings
+                  </Link>
+                  <Link
+                    href="/billing"
+                    className="block py-2 text-white hover:text-gray-300"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Billing
                   </Link>
                   <div className="border-t border-gray-600 my-2"></div>
                   <button
