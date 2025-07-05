@@ -1,42 +1,78 @@
 import React from 'react';
-import { getPageContent } from '../../lib/markdown'; // Adjust path as needed
+import { getMarkdownPageContent } from '../../lib/markdown'; // Import the new function
 
 export default async function Home() {
-  // Fetch the marketing content for the homepage
-  const { contentHtml } = await getPageContent('home'); // Assuming 'home.md' for marketing content
+  const { data, sections } = await getMarkdownPageContent('home'); // Get data (YAML) and sections from home.md
+
+  // Define image URLs corresponding to each section title (or a default)
+  const sectionImages: { [key: string]: string } = {
+    "Effortless Data Entry, Any Way You Work": "https://placehold.co/600x400/E0E7FF/3F51B5?text=Voice+%26+Image+Input",
+    "Beyond Simple Forms: Intelligent Workflows & Powerful Insights": "https://placehold.co/600x400/E0E7FF/3F51B5?text=Workflows+%26+Analytics",
+    "Designed for Teams, Scaled for Enterprise": "https://placehold.co/600x400/E0E7FF/3F51B5?text=Scalable+for+Teams",
+  };
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-24 bg-gray-100 text-gray-800">
-      {/* Removed the fixed header content that was causing overlap */}
-      {/* <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Welcome to&nbsp;
-          <code className="font-bold">AobaSpace Platform Core</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://nextjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Powered by Next.js & NestJS
-          </a>
-        </div>
-      </div> */}
+    <main className="flex flex-col items-center justify-center bg-gray-100 text-gray-800 min-h-screen">
+      {/* Hero Section - Conditionally rendered from YAML front matter */}
+      {data.heroTitle && data.heroSubtitle && data.heroButtonText && (
+        <section className="w-full bg-gradient-to-r from-blue-600 to-purple-700 text-white py-20 px-4 text-center">
+          <div className="max-w-5xl mx-auto">
+            <h1 className="text-5xl md:text-6xl font-extrabold mb-6 leading-tight">
+              {data.heroTitle}
+            </h1>
+            <p className="text-xl md:text-2xl mb-8 opacity-90">
+              {data.heroSubtitle}
+            </p>
+            <button className="bg-white text-blue-700 hover:bg-blue-100 font-bold py-3 px-8 rounded-full text-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+              {data.heroButtonText}
+            </button>
+          </div>
+        </section>
+      )}
 
-      {/* Removed z-[-1] from this div to ensure it's in normal flow */}
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 lg:before:h-[360px]">
-        <h1 className="text-4xl font-semibold text-center mt-8">
-          Your Central Hub for AobaForms Management
-        </h1>
-      </div>
+      {/* Dynamically rendered Feature Sections */}
+      {sections.map((section, index) => {
+        const isImageLeft = index % 2 === 0; // Alternate image left/right
+        const imageUrl = sectionImages[section.title];
+        const sectionBg = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
 
-      {contentHtml && (
-        <div
-          className="prose lg:prose-xl text-center max-w-4xl mt-12" // Apply prose for markdown styling
-          dangerouslySetInnerHTML={{ __html: contentHtml }}
-        />
+        return (
+          <section key={index} className={`w-full py-16 px-4 ${sectionBg}`}>
+            <div className={`max-w-6xl mx-auto flex flex-col items-center ${isImageLeft ? 'md:flex-row' : 'md:flex-row-reverse'} md:space-x-12`}>
+              <div className="md:w-1/2 mb-8 md:mb-0">
+                <h2 className="text-4xl font-bold text-gray-900 mb-4">{section.title}</h2>
+                <div
+                  className="prose lg:prose-xl text-left max-w-full" // Use prose for markdown styling
+                  dangerouslySetInnerHTML={{ __html: section.contentHtml }}
+                />
+              </div>
+              {imageUrl && (
+                <div className="md:w-1/2 flex justify-center">
+                  <img
+                    src={imageUrl}
+                    alt={section.title}
+                    className="rounded-lg shadow-xl max-w-full h-auto"
+                  />
+                </div>
+              )}
+            </div>
+          </section>
+        );
+      })}
+
+      {/* Final Call to Action Section - Conditionally rendered from YAML front matter */}
+      {data.ctaTitle && data.ctaSubtitle && data.ctaButtonText && (
+        <section className="w-full bg-gradient-to-l from-blue-600 to-purple-700 text-white py-20 px-4 text-center">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">{data.ctaTitle}</h2>
+            <p className="text-xl md:text-2xl mb-8 opacity-90">
+              {data.ctaSubtitle}
+            </p>
+            <button className="bg-white text-blue-700 hover:bg-blue-100 font-bold py-3 px-8 rounded-full text-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 mt-8">
+              {data.ctaButtonText}
+            </button>
+          </div>
+        </section>
       )}
     </main>
   );

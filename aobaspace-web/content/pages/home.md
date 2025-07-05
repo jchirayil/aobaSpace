@@ -1,12 +1,14 @@
 ---
-title: Welcome to AobaForms
+title: AobaForms Homepage Content
+heroTitle: Revolutionize Data Collection with AobaForms
+heroSubtitle: Effortless forms, powered by Voice, Image, and AI. Transform your workflow, capture data smarter, and gain instant insights.
+heroButtonText: Get Started Free
+ctaTitle: Unlock the Potential of Your Data
+ctaSubtitle: Stop wasting time on manual data entry and start leveraging the power of AI-driven forms. AobaForms is built to enhance efficiency, improve data quality, and transform how you collect and manage information.
+ctaButtonText: Ready to revolutionize your data collection?
 ---
 
-## Transform Your Data Collection with Voice & Image
-
-AobaForms is a revolutionary SaaS platform designed to streamline your data collection processes, making form filling faster, smarter, and more intuitive than ever before. Say goodbye to tedious manual entry and embrace the future of efficient data capture.
-
-### **Effortless Data Entry, Any Way You Work**
+## Effortless Data Entry, Any Way You Work
 
 We understand that data collection happens everywhere, in every way. That's why AobaForms empowers you with diverse, cutting-edge input methods:
 
@@ -16,7 +18,7 @@ We understand that data collection happens everywhere, in every way. That's why 
 
 * **Traditional Keyboard Input:** For when you prefer the classic approach, our intuitive interface ensures a seamless and familiar typing experience.
 
-### **Beyond Simple Forms: Intelligent Workflows & Powerful Insights**
+## Beyond Simple Forms: Intelligent Workflows & Powerful Insights
 
 AobaForms isn't just about collecting data; it's about making that data work for you.
 
@@ -26,16 +28,10 @@ AobaForms isn't just about collecting data; it's about making that data work for
 
 * **Centralized Data Management & Analytics:** All your collected data is securely stored and easily accessible. Dive into customizable dashboards, generate pivot tables, and visualize trends with powerful charts. Gain actionable insights from your data with advanced filtering and searching capabilities.
 
-### **Designed for Teams, Scaled for Enterprise**
+## Designed for Teams, Scaled for Enterprise
 
 Whether you're an individual, a growing team, or a large enterprise, AobaForms adapts to your scale:
 
 * **Flexible Account Types:** From individual accounts to comprehensive organization accounts with hierarchical user management, advanced access controls (RBAC), and branding options.
 * **Shared or Dedicated Instances:** Choose between cost-effective shared environments or opt for dedicated, isolated instances for enhanced performance, security, and compliance.
 * **Robust Security:** We prioritize your data's safety with end-to-end encryption, multi-factor authentication, and compliance-ready infrastructure.
-
-### **Unlock the Potential of Your Data**
-
-Stop wasting time on manual data entry and start leveraging the power of AI-driven forms. AobaForms is built to enhance efficiency, improve data quality, and transform how you collect and manage information.
-
-**Ready to revolutionize your data collection?**
