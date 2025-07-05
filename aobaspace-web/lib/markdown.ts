@@ -58,47 +58,59 @@ export async function getMarkdownPageContent(slug: string): Promise<MarkdownPage
   }
 
   const fileContents = fs.readFileSync(fullPath, 'utf8');
+  console.log('--- Raw Markdown File Contents ---');
+  console.log(fileContents);
+  console.log('----------------------------------');
+
   const matterResult = matter(fileContents);
   const markdownBody = matterResult.content;
   const frontMatterData = matterResult.data;
+
+  console.log('--- Parsed YAML Front Matter Data ---');
+  console.log(frontMatterData);
+  console.log('-------------------------------------');
 
   const sections: MarkdownSection[] = [];
   let currentSectionTitle: string = '';
   let currentSectionNodes: Content[] = [];
 
-  const processor = remark().use(html);
-  const tree = processor.parse(markdownBody) as Root; // Ensure it's a Root node
+  // Determine heading level for splitting sections, default to 2 (H2)
+  const sectionLevel = frontMatterData.sectionHeadingLevel || 2;
+
+  const processor = remark(); // Initialize remark without html for parsing and stringifying to markdown
+  const tree = processor.parse(markdownBody) as Root;
 
   for (let i = 0; i < tree.children.length; i++) {
     const node = tree.children[i];
 
-    if (node.type === 'heading' && node.depth === 2) { // Look for H2 headings
+    if (node.type === 'heading' && node.depth === sectionLevel) {
       if (currentSectionTitle) {
         // Process the collected nodes for the previous section
-        const sectionTree: Root = { type: 'root', children: currentSectionNodes };
-        const processedSectionContent = await processor.process(String(processor.stringify(sectionTree))); // Convert AST subtree to markdown, then process to HTML
+        const sectionMarkdown = processor.stringify({ type: 'root', children: currentSectionNodes });
+        const processedSectionContent = await remark().use(html).process(sectionMarkdown);
         sections.push({
           title: currentSectionTitle,
           contentHtml: processedSectionContent.toString(),
         });
+        console.log(`Generated section: "${currentSectionTitle}" HTML length: ${processedSectionContent.toString().length}`);
       }
       // Start a new section
-      currentSectionTitle = (node.children[0] as any)?.value || ''; // Assuming text node as child of heading
+      currentSectionTitle = (node.children[0] && 'value' in node.children[0] ? node.children[0].value : '') || '';
       currentSectionNodes = [];
     } else {
-      // Add node to current section content
       currentSectionNodes.push(node);
     }
   }
 
-  // Add the last section if it exists (only if it's a feature section, not CTA)
+  // Add the last section if it exists
   if (currentSectionTitle) {
-    const sectionTree: Root = { type: 'root', children: currentSectionNodes };
-    const processedSectionContent = await processor.process(String(processor.stringify(sectionTree)));
+    const sectionMarkdown = processor.stringify({ type: 'root', children: currentSectionNodes });
+    const processedSectionContent = await remark().use(html).process(sectionMarkdown);
     sections.push({
       title: currentSectionTitle,
       contentHtml: processedSectionContent.toString(),
     });
+    console.log(`Generated final section: "${currentSectionTitle}" HTML length: ${processedSectionContent.toString().length}`);
   }
 
   return {

@@ -1,15 +1,9 @@
 import React from 'react';
 import { getMarkdownPageContent } from '../../lib/markdown'; // Import the new function
+import ImageWithFallback from '@/components/ImageWithFallback'; // Import the new client component
 
 export default async function Home() {
   const { data, sections } = await getMarkdownPageContent('home'); // Get data (YAML) and sections from home.md
-
-  // Define image URLs corresponding to each section title (or a default)
-  const sectionImages: { [key: string]: string } = {
-    "Effortless Data Entry, Any Way You Work": "https://placehold.co/600x400/E0E7FF/3F51B5?text=Voice+%26+Image+Input",
-    "Beyond Simple Forms: Intelligent Workflows & Powerful Insights": "https://placehold.co/600x400/E0E7FF/3F51B5?text=Workflows+%26+Analytics",
-    "Designed for Teams, Scaled for Enterprise": "https://placehold.co/600x400/E0E7FF/3F51B5?text=Scalable+for+Teams",
-  };
 
   return (
     <main className="flex flex-col items-center justify-center bg-gray-100 text-gray-800 min-h-screen">
@@ -33,7 +27,10 @@ export default async function Home() {
       {/* Dynamically rendered Feature Sections */}
       {sections.map((section, index) => {
         const isImageLeft = index % 2 === 0; // Alternate image left/right
-        const imageUrl = sectionImages[section.title];
+        // Find the image URL from sectionsMetadata based on section title
+        const sectionMeta = data.sectionsMetadata?.find((meta: any) => meta.title === section.title);
+        const imageUrl = sectionMeta?.imageUrl;
+
         const sectionBg = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
 
         return (
@@ -48,7 +45,7 @@ export default async function Home() {
               </div>
               {imageUrl && (
                 <div className="md:w-1/2 flex justify-center">
-                  <img
+                  <ImageWithFallback
                     src={imageUrl}
                     alt={section.title}
                     className="rounded-lg shadow-xl max-w-full h-auto"

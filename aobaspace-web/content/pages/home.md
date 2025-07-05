@@ -6,6 +6,14 @@ heroButtonText: Get Started Free
 ctaTitle: Unlock the Potential of Your Data
 ctaSubtitle: Stop wasting time on manual data entry and start leveraging the power of AI-driven forms. AobaForms is built to enhance efficiency, improve data quality, and transform how you collect and manage information.
 ctaButtonText: Ready to revolutionize your data collection?
+sectionHeadingLevel: 2
+sectionsMetadata:
+  - title: Effortless Data Entry, Any Way You Work
+    imageUrl: https://placehold.co/600x400/E0E7FF/3F51B5?text=Voice+%26+Image+Input
+  - title: "Beyond Simple Forms: Intelligent Workflows & Powerful Insights"
+    imageUrl: https://placehold.co/600x400/E0E7FF/3F51B5?text=Workflows+%26+Analytics
+  - title: Designed for Teams, Scaled for Enterprise
+    imageUrl: https://placehold.co/600x400/E0E7FF/3F51B5?text=Scalable+for+Teams
 ---
 
 ## Effortless Data Entry, Any Way You Work
