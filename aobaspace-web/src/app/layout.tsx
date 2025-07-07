@@ -4,7 +4,7 @@ import { Inter } from 'next/font/google';
 import Navbar from '@/components/Navbar'; // Import the Navbar component
 import Footer from '@/components/Footer'; // NEW: Import the Footer component
 import { AuthProvider } from '@/context/AuthContext'; // Import the AuthProvider
-import { AuthFormVisibilityProvider } from '@/context/AuthFormVisibilityContext'; // NEW: Import AuthFormVisibilityProvider
+// Removed AuthFormVisibilityProvider as it's no longer needed for page-based auth
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -23,15 +23,13 @@ export default function RootLayout({
       <body className={inter.className + " flex flex-col min-h-screen"}>
         {/* Wrap the entire application with AuthProvider to make auth state available */}
         <AuthProvider>
-          {/* Wrap with AuthFormVisibilityProvider to manage modal visibility globally */}
-          <AuthFormVisibilityProvider>
-            <Navbar /> {/* Include the Navbar at the top of your layout */}
-            {/* Added pt-16 to push content down below the fixed Navbar */}
-            <div className="flex-grow pt-16">
-              {children}
-            </div>
-            <Footer /> {/* NEW: Include the Footer at the bottom of your layout */}
-          </AuthFormVisibilityProvider>
+          {/* Removed AuthFormVisibilityProvider wrapper */}
+          <Navbar /> {/* Include the Navbar at the top of your layout */}
+          {/* Added pt-16 to push content down below the fixed Navbar */}
+          <div className="flex-grow pt-16">
+            {children}
+          </div>
+          <Footer /> {/* NEW: Include the Footer at the bottom of your layout */}
         </AuthProvider>
       </body>
     </html>

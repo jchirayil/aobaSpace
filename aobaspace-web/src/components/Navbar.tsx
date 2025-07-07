@@ -3,13 +3,13 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation'; // For active link styling
 import { useAuth } from '@/context/AuthContext'; // Import useAuth hook
-import { useAuthFormVisibility } from '@/context/AuthFormVisibilityContext'; // NEW: Import AuthFormVisibilityContext
+// Removed useAuthFormVisibility as it's no longer needed for page-based auth
 import { useState, useRef, useEffect } from 'react'; // For dropdown functionality
 
 const Navbar = () => {
   const pathname = usePathname();
   const { isLoggedIn, logout } = useAuth(); // Get login status from context
-  const { setShowAuthForm } = useAuthFormVisibility(); // NEW: Get setShowAuthForm from context
+  // Removed setShowAuthForm as it's no longer needed
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // New state for mobile menu
   const dropdownRef = useRef<HTMLLIElement>(null); // Corrected type to HTMLLIElement
@@ -21,10 +21,11 @@ const Navbar = () => {
     setIsMobileMenuOpen(false); // Close mobile menu after action
   };
 
+  // Changed to navigate to login page directly
   const handleLoginSignUpClick = () => {
     setIsDropdownOpen(false); // Close dropdown
     setIsMobileMenuOpen(false); // Close mobile menu
-    setShowAuthForm(true); // Call the context function to show the auth form
+    // No longer calling setShowAuthForm(true)
   };
 
   const toggleDropdown = () => {
@@ -124,12 +125,13 @@ const Navbar = () => {
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-gray-700 rounded-md shadow-lg py-1 z-50">
                 {!isLoggedIn ? (
-                  <button
-                    onClick={handleLoginSignUpClick}
+                  <Link
+                    href="/login" // Changed to Link to login page
                     className="block w-full text-left px-4 py-2 text-lg text-white hover:bg-gray-600"
+                    onClick={handleLoginSignUpClick} // Still call this to close dropdown/mobile menu
                   >
                     Login / Sign Up
-                  </button>
+                  </Link>
                 ) : (
                   <>
                     <Link
@@ -211,12 +213,13 @@ const Navbar = () => {
             {/* Your Account options for Mobile */}
             <li>
               {!isLoggedIn ? (
-                <button
-                  onClick={handleLoginSignUpClick}
+                <Link
+                  href="/login" // Changed to Link to login page
                   className="block w-full text-center py-2 text-white hover:text-gray-300"
+                  onClick={handleLoginSignUpClick} // Still call this to close dropdown/mobile menu
                 >
                   Login / Sign Up
-                </button>
+                </Link>
               ) : (
                 <>
                   <Link

@@ -1,6 +1,7 @@
 'use client'; // This context needs to be a Client Component to use useState and localStorage
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useRouter } from 'next/navigation'; // Import useRouter
 
 // Define the shape of our authentication context
 interface AuthContextType {
@@ -16,6 +17,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // AuthProvider component to wrap around components that need auth state
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const router = useRouter(); // Initialize useRouter
+
   // Initialize token state from localStorage
   const [token, setToken] = useState<string | null>(() => {
     if (typeof window !== 'undefined') { // Check if running in browser
@@ -61,6 +64,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const data = await response.json();
       console.log('Login API Success Response:', data); // Log success response
       setToken(data.access_token || 'dummy-jwt-token'); // Assuming backend returns a token, or use dummy
+      router.push('/dashboard'); // Redirect to dashboard on successful login
     } catch (error: any) {
       console.error('Login error in AuthContext:', error);
       throw error; // Re-throw to be caught by the component
@@ -85,6 +89,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       console.log('Registration successful!');
+      router.push('/login?registered=true'); // Redirect to login page after successful registration
     } catch (error: any) {
       console.error('Registration error in AuthContext:', error);
       throw error; // Re-throw to be caught by the component
@@ -93,6 +98,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = () => {
     setToken(null);
+    router.push('/'); // Redirect to home page on logout
   };
 
   return (

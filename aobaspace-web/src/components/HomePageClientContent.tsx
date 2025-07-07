@@ -1,10 +1,11 @@
 'use client'; // This is a Client Component
 
-import React, { useState } from 'react';
+import React from 'react';
 import ImageWithFallback from '@/components/ImageWithFallback';
-import LoginRegisterForm from '@/components/LoginRegisterForm';
+// Removed LoginRegisterForm import
 import { useAuth } from '@/context/AuthContext';
-import { useAuthFormVisibility } from '@/context/AuthFormVisibilityContext'; // NEW: Import AuthFormVisibilityContext
+// Removed useAuthFormVisibility import and usage
+import Link from 'next/link'; // Import Link for navigation
 
 interface HomePageClientContentProps {
   markdownData: any;
@@ -13,7 +14,7 @@ interface HomePageClientContentProps {
 
 const HomePageClientContent: React.FC<HomePageClientContentProps> = ({ markdownData, markdownSections }) => {
   const { isLoggedIn } = useAuth();
-  const { showAuthForm, setShowAuthForm } = useAuthFormVisibility(); // Get state and setter from context
+  // Removed showAuthForm and setShowAuthForm from context
 
   if (!markdownData) {
     return (
@@ -37,23 +38,18 @@ const HomePageClientContent: React.FC<HomePageClientContentProps> = ({ markdownD
                 {markdownData.heroSubtitle}
               </p>
               {!isLoggedIn && ( // Only show button if not logged in
-                <button
-                  onClick={() => setShowAuthForm(true)}
+                <Link
+                  href="/login" // Changed to Link to login page
                   className="bg-white text-blue-700 hover:bg-blue-100 font-bold py-3 px-8 rounded-full text-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
                 >
                   {markdownData.heroButtonText}
-                </button>
+                </Link>
               )}
             </div>
           </section>
         )}
 
-        {/* Login/Register Form Overlay */}
-        {showAuthForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <LoginRegisterForm onClose={() => setShowAuthForm(false)} />
-          </div>
-        )}
+        {/* Removed Login/Register Form Overlay */}
 
         {/* Dynamically rendered Feature Sections */}
         {markdownSections.map((section: any, index: number) => {
@@ -97,12 +93,12 @@ const HomePageClientContent: React.FC<HomePageClientContentProps> = ({ markdownD
                 {markdownData.ctaSubtitle}
               </p>
               {!isLoggedIn && ( // Only show button if not logged in
-                <button
-                  onClick={() => setShowAuthForm(true)}
+                <Link
+                  href="/login" // Changed to Link to login page
                   className="bg-white text-blue-700 hover:bg-blue-100 font-bold py-3 px-8 rounded-full text-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 mt-8"
                 >
                   {markdownData.ctaButtonText}
-                </button>
+                </Link>
               )}
             </div>
           </section>
