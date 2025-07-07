@@ -11,7 +11,6 @@ export class UsersService {
   ) {}
 
   async create(userData: Partial<User>): Promise<User> {
-    // In a real app, hash password before saving
     const newUser = this.usersRepository.create(userData);
     return this.usersRepository.save(newUser);
   }
@@ -23,13 +22,11 @@ export class UsersService {
   async findOrCreateBySso(ssoProvider: string, ssoId: string): Promise<User> {
     let user = await this.usersRepository.findOne({ where: { ssoProvider, ssoId } });
     if (!user) {
-      // Create a new user if not found
       user = this.usersRepository.create({
-        username: `${ssoProvider}_${ssoId}`, // Example username
-        email: `${ssoId}@${ssoProvider}.com`, // Placeholder email
+        username: `${ssoProvider}_${ssoId}`,
+        email: `${ssoId}@${ssoProvider}.com`,
         ssoProvider,
         ssoId,
-        // Assign default roles, etc.
       });
       await this.usersRepository.save(user);
     }

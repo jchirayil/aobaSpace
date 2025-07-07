@@ -10,7 +10,7 @@ export function middleware(request: NextRequest) {
 
   // Define protected routes using a regex or an array of paths
   // Any path under '/dashboard' (due to the (auth) route group) will be protected
-  const protectedPaths = ['/dashboard']; // Add more protected paths as needed
+  const protectedPaths = ['/dashboard', '/profile', '/settings', '/billing']; // Added new protected paths
 
   // Check if the current path is protected and the user is NOT logged in
   if (protectedPaths.some(path => pathname.startsWith(path)) && !isLoggedIn) {

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -ex # CHANGED: Added -e for immediate exit on error, kept -x for debugging
+set -ex
 
 # wait-for-it.sh
 
@@ -11,8 +11,8 @@ set -ex # CHANGED: Added -e for immediate exit on error, kept -x for debugging
 # Default timeout in seconds
 TIMEOUT=15
 QUIET=0
-HOST=
-PORT=
+TARGET_HOST= # Changed from HOST
+TARGET_PORT= # Changed from PORT
 CMD=
 
 # Explicitly get DB credentials from environment variables
@@ -37,30 +37,30 @@ USAGE
 }
 
 wait_for() {
-  echoerr "Waiting for $HOST:$PORT (database $DB_NAME, user $DB_USER) to be available..."
+  echoerr "Waiting for $TARGET_HOST:$TARGET_PORT (database $DB_NAME, user $DB_USER) to be available..."
   echoerr "Checking POSTGRES_PASSWORD length: ${#DB_PASSWORD}" # Debug print for password length (masked)
 
   for i in $(seq $TIMEOUT); do
-    if [ "$PORT" -gt 0 ]; then
+    if [ "$TARGET_PORT" -gt 0 ]; then
       # Use pg_isready to check if the PostgreSQL database is ready
       # -h host, -p port, -U user, -d database, -t timeout (1 second for each check)
       # Set PGPASSWORD directly for pg_isready
-      PGPASSWORD="$DB_PASSWORD" pg_isready -h "$HOST" -p "$PORT" -U "$DB_USER" -d "$DB_NAME" -t 1 > /dev/null 2>&1
+      PGPASSWORD="$DB_PASSWORD" pg_isready -h "$TARGET_HOST" -p "$TARGET_PORT" -U "$DB_USER" -d "$DB_NAME" -t 1 > /dev/null 2>&1
       result=$?
     else
       # Fallback to ping if no port (less common for databases, but kept for completeness)
-      ping -c 1 "$HOST" > /dev/null 2>&1
+      ping -c 1 "$TARGET_HOST" > /dev/null 2>&1
       result=$?
     fi
 
     if [ $result -eq 0 ]; then
-      echoerr "$HOST:$PORT (database $DB_NAME) is available after $i seconds"
+      echoerr "$TARGET_HOST:$TARGET_PORT (database $DB_NAME) is available after $i seconds"
       return 0
     fi
-    echoerr "Attempt $i/$TIMEOUT: $HOST:$PORT (database $DB_NAME) is not yet available. Sleeping 1 second."
+    echoerr "Attempt $i/$TIMEOUT: $TARGET_HOST:$TARGET_PORT (database $DB_NAME) is not yet available. Sleeping 1 second."
     sleep 1
   done
-  echoerr "Timeout occurred after $TIMEOUT seconds waiting for $HOST:$PORT (database $DB_NAME)"
+  echoerr "Timeout occurred after $TIMEOUT seconds waiting for $TARGET_HOST:$TARGET_PORT (database $DB_NAME)"
   return 1
 }
 
@@ -68,8 +68,8 @@ wait_for() {
 while [ $# -gt 0 ]; do
   case "$1" in
     *:*)
-      HOST=$(printf "%s\n" "$1"| cut -d : -f 1)
-      PORT=$(printf "%s\n" "$1"| cut -d : -f 2)
+      TARGET_HOST=$(printf "%s\n" "$1"| cut -d : -f 1) # Changed to TARGET_HOST
+      TARGET_PORT=$(printf "%s\n" "$1"| cut -d : -f 2) # Changed to TARGET_PORT
       shift 1
       ;;
     -h | --help)
@@ -98,14 +98,14 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-if [ -z "$HOST" ]; then
+if [ -z "$TARGET_HOST" ]; then # Changed to TARGET_HOST
   echoerr "Error: host:port argument is required."
   usage
 fi
 
 if wait_for; then
   echoerr "Database is ready. Adding a small delay before starting the application..."
-  sleep 2 # NEW: Add a 2-second sleep after database is ready
+  sleep 2
   if [ -n "$CMD" ]; then
     echoerr "Executing command: $CMD"
     exec $CMD

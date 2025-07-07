@@ -11,13 +11,14 @@ services:
     #   - /app/node_modules
     environment:
       - NODE_ENV=development
+      - PORT=3000 # Eplicitily set API port
       - POSTGRES_HOST=postgres # NEW: Explicit host for TypeORM
       - POSTGRES_PORT=5432     # NEW: Explicit port for TypeORM
       - POSTGRES_USER=user     # NEW: Explicit user for TypeORM
       - POSTGRES_PASSWORD=password # NEW: Explicit password for TypeORM
       - POSTGRES_DB=aobaspace_db # NEW: Explicit database for TypeORM
-    env_file:
-      - ./aobaspace-api/.env
+    #env_file:
+    #  - ./aobaspace-api/.env
     depends_on:
       - postgres
     networks:

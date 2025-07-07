@@ -1,13 +1,13 @@
 import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { User } from './entities/user.entity'; // Import User entity
+import { User } from './entities/user.entity';
 
-@Controller('api/users') // Prefix all routes in this controller with /api/users
+@Controller('api/users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() createUserDto: Partial<User>): Promise<User> { // Use DTOs for validation
+  create(@Body() createUserDto: Partial<User>): Promise<User> {
     return this.usersService.create(createUserDto);
   }
 

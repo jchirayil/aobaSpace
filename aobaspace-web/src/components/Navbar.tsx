@@ -3,25 +3,28 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation'; // For active link styling
 import { useAuth } from '@/context/AuthContext'; // Import useAuth hook
+import { useAuthFormVisibility } from '@/context/AuthFormVisibilityContext'; // NEW: Import AuthFormVisibilityContext
 import { useState, useRef, useEffect } from 'react'; // For dropdown functionality
 
 const Navbar = () => {
   const pathname = usePathname();
-  const { isLoggedIn, login, logout } = useAuth(); // Get login status from context
+  const { isLoggedIn, logout } = useAuth(); // Get login status from context
+  const { setShowAuthForm } = useAuthFormVisibility(); // NEW: Get setShowAuthForm from context
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // New state for mobile menu
   const dropdownRef = useRef<HTMLLIElement>(null); // Corrected type to HTMLLIElement
 
-  const handleAuthClick = () => {
-    if (isLoggedIn) {
-      console.log('Logging out...');
-      logout(); // Call logout from context
-    } else {
-      console.log('Logging in...');
-      login(); // Call login from context
-    }
+  const handleLogoutClick = () => {
+    console.log('Logging out...');
+    logout(); // Call logout from context
     setIsDropdownOpen(false); // Close dropdown after action
     setIsMobileMenuOpen(false); // Close mobile menu after action
+  };
+
+  const handleLoginSignUpClick = () => {
+    setIsDropdownOpen(false); // Close dropdown
+    setIsMobileMenuOpen(false); // Close mobile menu
+    setShowAuthForm(true); // Call the context function to show the auth form
   };
 
   const toggleDropdown = () => {
@@ -122,7 +125,7 @@ const Navbar = () => {
               <div className="absolute right-0 mt-2 w-48 bg-gray-700 rounded-md shadow-lg py-1 z-50">
                 {!isLoggedIn ? (
                   <button
-                    onClick={handleAuthClick}
+                    onClick={handleLoginSignUpClick}
                     className="block w-full text-left px-4 py-2 text-lg text-white hover:bg-gray-600"
                   >
                     Login / Sign Up
@@ -160,7 +163,7 @@ const Navbar = () => {
                     </Link>
                     <div className="border-t border-gray-600 my-1"></div>
                     <button
-                      onClick={handleAuthClick}
+                      onClick={handleLogoutClick}
                       className="block w-full text-left px-4 py-2 text-lg text-white hover:bg-gray-600"
                     >
                       Logout
@@ -209,7 +212,7 @@ const Navbar = () => {
             <li>
               {!isLoggedIn ? (
                 <button
-                  onClick={handleAuthClick}
+                  onClick={handleLoginSignUpClick}
                   className="block w-full text-center py-2 text-white hover:text-gray-300"
                 >
                   Login / Sign Up
@@ -247,7 +250,7 @@ const Navbar = () => {
                   </Link>
                   <div className="border-t border-gray-600 my-2"></div>
                   <button
-                    onClick={handleAuthClick}
+                    onClick={handleLogoutClick}
                     className="block w-full text-center py-2 text-white hover:text-gray-300"
                   >
                     Logout
