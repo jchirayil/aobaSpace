@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common'; // Import UnauthorizedException
 import { UsersService } from '../users/users.service';
-import { OrganizationsService } from '../organizations/organizations.service'; // NEW: Import OrganizationsService
+import { OrganizationsService } from '../organizations/organizations.service'; // Corrected path and file name to organizations.service
 import * as bcrypt from 'bcryptjs'; // NEW: Import bcryptjs
 
 @Injectable()

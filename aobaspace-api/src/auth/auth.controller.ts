@@ -20,7 +20,7 @@ export class AuthController {
     try {
       const user = await this.authService.validateUser(loginDto.username, loginDto.password);
       // Retrieve dummy token from config
-      const dummyAccessToken = this.configService.get<string>('auth.dummyToken');
+      const dummyAccessToken = this.configService.get<string>('DUMMY_ACCESS_TOKEN');
 
       // For a successful login, return a dummy access_token for now
       // In a real application, you would generate a JWT here.

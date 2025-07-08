@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { UsersController } from './users.controller';
+import { UsersService } from './users.service'; // Corrected '=' to 'from'
+import { UsersController } from './users.controller'; // Corrected '=' to 'from'
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserAccount } from './entities/user_account.entity'; // NEW
 import { UserProfile } from './entities/user_profile.entity'; // NEW

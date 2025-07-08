@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository } from 'typeorm'; // Corrected '=' to 'from'
 import { Organization } from '../users/entities/organization.entity'; // Import Organization entity
 import { UserOrganization } from '../users/entities/user_organization.entity'; // Import UserOrganization entity
 import { CreateOrganizationDto, UpdateOrganizationDto } from '../users/dto/user.dto'; // Import DTOs

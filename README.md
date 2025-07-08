@@ -71,7 +71,7 @@ Before you begin, ensure you have the following installed:
         # Dummy Access Token for testing/development (replace with real JWT generation in production)
         DUMMY_ACCESS_TOKEN=dummy-jwt-token-abc123
         ```
-        **Note:** For `DATABASE_URL` in `aobaspace-api/.env`, `postgres` refers to the service name defined in `docker-compose.yml`. If running outside Docker, you'd use `localhost`.
+        **Note:** The `aobaspace-api/.env` file is now the single source of truth for these environment variables for both the backend API and the PostgreSQL database service when running with Docker Compose.
 
 4.  **Install Dependencies (Locally - For Running Outside Docker Compose):**
     These steps are primarily for when you want to run the frontend or backend directly on your host machine for faster development iteration, bypassing Docker for the application code. If you are *always* using `docker-compose up --build`, these local installs are not strictly necessary as `npm install` happens within the Dockerfile.

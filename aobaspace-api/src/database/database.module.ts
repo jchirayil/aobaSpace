@@ -14,11 +14,11 @@ import { UserOrganization } from '../users/entities/user_organization.entity'; /
       useFactory: (configService: ConfigService) => {
         const dbConfig = {
           type: 'postgres' as 'postgres', // Explicitly cast to literal type
-          host: configService.get<string>('database.host'), // Get from config
-          port: configService.get<number>('database.port'), // Get from config
-          username: configService.get<string>('database.user'), // Get from config
-          password: configService.get<string>('database.password'), // Get from config
-          database: configService.get<string>('database.name'), // Get from config
+          host: configService.get<string>('POSTGRES_HOST'), // Get from config
+          port: configService.get<number>('POSTGRES_PORT'), // Get from config
+          username: configService.get<string>('POSTGRES_USER'), // Get from config
+          password: configService.get<string>('POSTGRES_PASSWORD'), // Get from config
+          database: configService.get<string>('POSTGRES_DB'), // Get from config
           entities: [
             UserAccount,    // NEW
             UserProfile,    // NEW

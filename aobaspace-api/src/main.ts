@@ -2,7 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config'; // Import ConfigService
-import configuration from './config/configuration'; // Import the configuration
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -10,8 +9,8 @@ async function bootstrap() {
   const configService = app.get(ConfigService); // Get ConfigService instance
 
   // Determine CORS origin based on environment from config
-  const corsOrigin = configService.get<string>('app.corsOrigin');
-  const appPort = configService.get<number>('app.port');
+  const corsOrigin = configService.get<string>('CORS_ORIGIN');
+  const appPort = configService.get<number>('PORT');
 
   // Log the environment and CORS origin for debugging
   console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
