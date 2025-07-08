@@ -1,7 +1,11 @@
 import { Module, Logger } from '@nestjs/common'; // Import Logger
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
-import { User } from '../users/entities/user.entity';
+import { UserAccount } from '../users/entities/user_account.entity'; // NEW
+import { UserProfile } from '../users/entities/user_profile.entity'; // NEW
+import { UserPassword } from '../users/entities/user_password.entity'; // NEW
+import { Organization } from '../users/entities/organization.entity'; // NEW
+import { UserOrganization } from '../users/entities/user_organization.entity'; // NEW
 
 @Module({
   imports: [
@@ -15,7 +19,13 @@ import { User } from '../users/entities/user.entity';
           username: configService.get<string>('POSTGRES_USER'),
           password: configService.get<string>('POSTGRES_PASSWORD'),
           database: configService.get<string>('POSTGRES_DB'),
-          entities: [User],
+          entities: [
+            UserAccount,    // NEW
+            UserProfile,    // NEW
+            UserPassword,   // NEW
+            Organization,   // NEW
+            UserOrganization, // NEW
+          ],
           synchronize: true, // Auto-create tables (for development)
           logging: true, // Enable TypeORM logging
         };

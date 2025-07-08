@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { DatabaseModule } from './database/database.module';
+import { OrganizationModule } from './organizations/organizations.module'; // Corrected path and file name to organizations.module
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { DatabaseModule } from './database/database.module';
     DatabaseModule,
     AuthModule,
     UsersModule,
+    OrganizationModule, // NEW: Add OrganizationModule
   ],
   controllers: [AppController],
   providers: [AppService],

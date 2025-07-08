@@ -26,29 +26,6 @@ interface MarkdownPageContent {
   sections: MarkdownSection[];
 }
 
-export async function getPageContent(slug: string) {
-  const fullPath = path.join(pagesDirectory, `${slug}.md`);
-  
-  if (!fs.existsSync(fullPath)) {
-    console.warn(`Markdown file not found: ${fullPath}`);
-    return { contentHtml: null, data: {} };
-  }
-
-  const fileContents = fs.readFileSync(fullPath, 'utf8');
-  const matterResult = matter(fileContents);
-
-  const processedContent = await remark()
-    .use(html)
-    .process(matterResult.content);
-  const contentHtml = processedContent.toString();
-
-  return {
-    slug,
-    contentHtml,
-    data: matterResult.data, // Return front matter data
-  };
-}
-
 export async function getMarkdownPageContent(slug: string): Promise<MarkdownPageContent> {
   const fullPath = path.join(pagesDirectory, `${slug}.md`);
 
@@ -116,5 +93,28 @@ export async function getMarkdownPageContent(slug: string): Promise<MarkdownPage
   return {
     data: frontMatterData,
     sections: sections,
+  };
+}
+
+export async function getPageContent(slug: string) {
+  const fullPath = path.join(pagesDirectory, `${slug}.md`);
+  
+  if (!fs.existsSync(fullPath)) {
+    console.warn(`Markdown file not found: ${fullPath}`);
+    return { contentHtml: null, data: {} };
+  }
+
+  const fileContents = fs.readFileSync(fullPath, 'utf8');
+  const matterResult = matter(fileContents);
+
+  const processedContent = await remark()
+    .use(html)
+    .process(matterResult.content);
+  const contentHtml = processedContent.toString();
+
+  return {
+    slug,
+    contentHtml,
+    data: matterResult.data, // Return front matter data
   };
 }

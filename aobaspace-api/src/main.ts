@@ -8,9 +8,6 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService); // Get ConfigService instance
 
-  console.log('ConfigService initialized:', configService);
-  console.log('Process environment variables:', process.env);
-
   // Determine CORS origin based on environment
   const isProduction = process.env.NODE_ENV === 'production';
   const corsOrigin = isProduction ? 'https://your-aobaspace-web-domain.com' : 'http://localhost:3001';
