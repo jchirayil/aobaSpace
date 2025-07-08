@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn } from 'typeorm'; // Added JoinColumn
 import { UserAccount } from './user_account.entity'; // NEW: Import UserAccount
 
 @Entity('user_profiles')
@@ -24,7 +24,8 @@ export class UserProfile {
   @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
 
-  // Relationship
+  // Relationship - This is where the foreign key is defined
   @OneToOne(() => UserAccount, userAccount => userAccount.profile)
+  @JoinColumn({ name: 'userAccountId', referencedColumnName: 'id' }) // userAccountId in UserProfile references id in UserAccount
   userAccount: UserAccount;
 }

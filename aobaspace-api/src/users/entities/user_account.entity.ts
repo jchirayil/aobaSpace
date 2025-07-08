@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, OneToOne, OneToMany } from 'typeorm'; // Removed JoinColumn from here
 import { UserProfile } from './user_profile.entity'; // NEW: Import UserProfile
 import { UserPassword } from './user_password.entity'; // NEW: Import UserPassword
 import { UserOrganization } from './user_organization.entity'; // NEW: Import UserOrganization
@@ -35,13 +35,11 @@ export class UserAccount {
   @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
 
-  // Relationships
+  // Relationships - Foreign keys are now defined on the *other* side (UserProfile, UserPassword)
   @OneToOne(() => UserProfile, userProfile => userProfile.userAccount, { cascade: true })
-  @JoinColumn({ name: 'id', referencedColumnName: 'userAccountId' }) // Link by userAccountId in UserProfile
   profile: UserProfile;
 
   @OneToOne(() => UserPassword, userPassword => userPassword.userAccount, { cascade: true })
-  @JoinColumn({ name: 'id', referencedColumnName: 'userAccountId' }) // Link by userAccountId in UserPassword
   password: UserPassword;
 
   @OneToMany(() => UserOrganization, userOrganization => userOrganization.userAccount)
