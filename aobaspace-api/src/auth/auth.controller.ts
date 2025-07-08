@@ -1,10 +1,14 @@
 import { Controller, Post, Body, Res, HttpStatus, UnauthorizedException } from '@nestjs/common'; // Import UnauthorizedException
 import { AuthService } from './auth.service';
 import { Response } from 'express'; // Import Response from express
+import { ConfigService } from '@nestjs/config'; // Import ConfigService
 
 @Controller('api/auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private configService: ConfigService, // Inject ConfigService
+  ) {}
 
   @Post('register')
   async register(@Body() registerDto: any) {
@@ -15,6 +19,9 @@ export class AuthController {
   async login(@Body() loginDto: any, @Res() res: Response) {
     try {
       const user = await this.authService.validateUser(loginDto.username, loginDto.password);
+      // Retrieve dummy token from config
+      const dummyAccessToken = this.configService.get<string>('auth.dummyToken');
+
       // For a successful login, return a dummy access_token for now
       // In a real application, you would generate a JWT here.
       return res.status(HttpStatus.OK).json({
@@ -27,7 +34,7 @@ export class AuthController {
           lastName: user.lastName,
           avatarUrl: user.avatarUrl,
         },
-        access_token: 'dummy-jwt-token-abc123', // Keep dummy token for now
+        access_token: dummyAccessToken, // Use dummy token from config
         userId: user.id, // Explicitly pass the user ID for frontend use
       });
     } catch (error) {

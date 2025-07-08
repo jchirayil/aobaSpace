@@ -5,22 +5,12 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
-    # Removed volume mounts for application code to ensure Docker build artifacts are used
-    # volumes:
-    #   - ./aobaspace-api:/app
-    #   - /app/node_modules
-    environment:
-      - NODE_ENV=development
-      - PORT=3000 # Eplicitily set API port
-      - POSTGRES_HOST=postgres # NEW: Explicit host for TypeORM
-      - POSTGRES_PORT=5432     # NEW: Explicit port for TypeORM
-      - POSTGRES_USER=user     # NEW: Explicit user for TypeORM
-      - POSTGRES_PASSWORD=password # NEW: Explicit password for TypeORM
-      - POSTGRES_DB=aobaspace_db # NEW: Explicit database for TypeORM
-    #env_file:
-    #  - ./aobaspace-api/.env
+    # Load environment variables from the .env file
+    env_file:
+      - ./aobaspace-api/.env # This loads all variables from the specified .env file
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - aobaspace-network
     command: ["./wait-for-it.sh", "postgres:5432", "--", "node", "dist/main"]
@@ -31,10 +21,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3001:3000" # Frontend runs on port 3000 inside container, map to 3001 on host
-    # Removed volume mounts for application code to ensure Docker build artifacts are used
-    # volumes:
-    #   - ./aobaspace-web:/app
-    #   - /app/node_modules
     env_file:
       - ./aobaspace-web/.env
     depends_on:
@@ -45,22 +31,21 @@ services:
   postgres:
     image: postgres:14-alpine
     restart: always
-    environment:
-      POSTGRES_DB: aobaspace_db
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+    # Load environment variables from the .env file
+    env_file:
+      - ./aobaspace-api/.env # Postgres will now also read its env vars from this file
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - aobaspace-network
-    healthcheck: # Added healthcheck for postgres
+    healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
       timeout: 5s
       retries: 10
-      start_period: 10s # Give it some time to start initially
+      start_period: 10s
 
 networks:
   aobaspace-network:
@@ -68,4 +53,3 @@ networks:
 
 volumes:
   postgres_data:
-  

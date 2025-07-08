@@ -43,7 +43,7 @@ Before you begin, ensure you have the following installed:
     * **`aobaspace-api/.env`**:
         ```env
         PORT=3000
-        # Use individual variables for Docker Compose for robustness
+        # Database Configuration
         POSTGRES_HOST=postgres
         POSTGRES_PORT=5432
         POSTGRES_USER=user
@@ -52,6 +52,9 @@ Before you begin, ensure you have the following installed:
 
         # Keep DATABASE_URL for local development outside Docker if needed
         DATABASE_URL="postgresql://user:password@localhost:5432/aobaspace_db"
+
+        # Application Specific Settings
+        CORS_ORIGIN=http://localhost:3001 # Frontend URL for CORS
 
         # Auth0 / Firebase / Other SSO Credentials (placeholders)
         AUTH0_DOMAIN=
@@ -64,6 +67,9 @@ Before you begin, ensure you have the following installed:
 
         # JWT Secret for internal tokens (if you implement custom JWTs)
         JWT_SECRET=yourSuperSecretJwtKey
+
+        # Dummy Access Token for testing/development (replace with real JWT generation in production)
+        DUMMY_ACCESS_TOKEN=dummy-jwt-token-abc123
         ```
         **Note:** For `DATABASE_URL` in `aobaspace-api/.env`, `postgres` refers to the service name defined in `docker-compose.yml`. If running outside Docker, you'd use `localhost`.
 
