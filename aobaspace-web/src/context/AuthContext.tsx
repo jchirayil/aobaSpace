@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'; // Import useRouter
 // Define the shape of our authentication context
 interface AuthContextType {
   isLoggedIn: boolean;
-  token: string | null; // Store the JWT token
+  userId: string | null; // Changed from token to userId
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
   logout: () => void;
@@ -19,30 +19,30 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter(); // Initialize useRouter
 
-  // Initialize token state from localStorage
-  const [token, setToken] = useState<string | null>(() => {
+  // Initialize userId state from localStorage
+  const [userId, setUserId] = useState<string | null>(() => { // Changed from token to userId
     if (typeof window !== 'undefined') { // Check if running in browser
-      return localStorage.getItem('authToken');
+      return localStorage.getItem('currentUserId'); // Use a different key for userId
     }
     return null;
   });
 
-  const isLoggedIn = !!token; // Derive isLoggedIn from token presence
+  const isLoggedIn = !!userId; // Derive isLoggedIn from userId presence
 
-  // Effect to update localStorage whenever token changes
+  // Effect to update localStorage whenever userId changes
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      if (token) {
-        localStorage.setItem('authToken', token);
+      if (userId) {
+        localStorage.setItem('currentUserId', userId); // Store userId
         // Set a simple cookie for middleware to read
         document.cookie = `isLoggedIn=true; path=/; max-age=${60 * 60 * 24 * 7}`; // 7 days
       } else {
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('currentUserId'); // Remove userId
         // Expire the cookie
         document.cookie = `isLoggedIn=false; path=/; max-age=0`;
       }
     }
-  }, [token]);
+  }, [userId]); // Depend on userId
 
   const login = async (email: string, password: string) => {
     try {
@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       const data = await response.json();
       console.log('Login API Success Response:', data); // Log success response
-      setToken(data.access_token || 'dummy-jwt-token'); // Assuming backend returns a token, or use dummy
+      setUserId(data.userId); // Set the actual userId from the response
       router.push('/dashboard'); // Redirect to dashboard on successful login
     } catch (error: any) {
       console.error('Login error in AuthContext:', error);
@@ -97,12 +97,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = () => {
-    setToken(null);
-    router.push('/'); // Redirect to home page on logout
+    setUserId(null); // Clear userId on logout
+    router.push('/');
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, token, login, register, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, userId, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

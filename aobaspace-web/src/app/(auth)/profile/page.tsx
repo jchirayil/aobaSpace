@@ -6,7 +6,7 @@ import ImageWithFallback from '@/components/ImageWithFallback'; // Assuming you 
 import { useRouter } from 'next/navigation';
 
 const ProfilePage = () => {
-  const { token, isLoggedIn, logout } = useAuth();
+  const { userId, isLoggedIn, logout } = useAuth(); // Changed from token to userId
   const router = useRouter();
   const [userData, setUserData] = useState<any>(null);
   const [organizationData, setOrganizationData] = useState<any>(null);
@@ -15,7 +15,7 @@ const ProfilePage = () => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (!isLoggedIn || !token) {
+      if (!isLoggedIn || !userId) { // Use userId here
         // Redirect to login if not authenticated
         router.push('/login');
         return;
@@ -25,16 +25,10 @@ const ProfilePage = () => {
       setError(null);
 
       try {
-        // Decode the token to get the user ID (assuming JWT structure with 'sub' as user ID)
-        // In a real app, you'd parse the JWT to get the user ID.
-        // For now, we'll assume the token itself is the user ID for simplicity, or get it from context if passed.
-        // A better way would be to have a /api/me endpoint or decode JWT client-side
-        const dummyUserId = token; // This is a placeholder, replace with actual ID from decoded JWT
-
-        // Fetch user profile
-        const userResponse = await fetch(`http://localhost:3000/api/users/${dummyUserId}`, {
+        // Use the actual userId from context
+        const userResponse = await fetch(`http://localhost:3000/api/users/${userId}`, { // Use userId
           headers: {
-            'Authorization': `Bearer ${token}`,
+            // 'Authorization': `Bearer ${token}`, // If using JWT, this would be the actual JWT
             'Content-Type': 'application/json',
           },
         });
@@ -45,9 +39,9 @@ const ProfilePage = () => {
         setUserData(userJson);
 
         // Fetch personal organization for the user
-        const orgResponse = await fetch(`http://localhost:3000/api/organizations/user/${dummyUserId}`, {
+        const orgResponse = await fetch(`http://localhost:3000/api/organizations/user/${userId}`, { // Use userId
           headers: {
-            'Authorization': `Bearer ${token}`,
+            // 'Authorization': `Bearer ${token}`, // If using JWT, this would be the actual JWT
             'Content-Type': 'application/json',
           },
         });
@@ -71,7 +65,7 @@ const ProfilePage = () => {
     };
 
     fetchUserData();
-  }, [isLoggedIn, token, router, logout]);
+  }, [isLoggedIn, userId, router, logout]); // Depend on userId
 
   if (loading) {
     return (

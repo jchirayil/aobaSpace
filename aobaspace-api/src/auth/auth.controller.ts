@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Res, HttpStatus, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Body, Res, HttpStatus, UnauthorizedException } from '@nestjs/common'; // Import UnauthorizedException
 import { AuthService } from './auth.service';
 import { Response } from 'express'; // Import Response from express
 
@@ -17,14 +17,26 @@ export class AuthController {
       const user = await this.authService.validateUser(loginDto.username, loginDto.password);
       // For a successful login, return a dummy access_token for now
       // In a real application, you would generate a JWT here.
-      return res.status(HttpStatus.OK).json({ message: 'Login successful', user, access_token: 'dummy-jwt-token-abc123' });
+      return res.status(HttpStatus.OK).json({
+        message: 'Login successful',
+        user: { // Return a simplified user object for the frontend
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          avatarUrl: user.avatarUrl,
+        },
+        access_token: 'dummy-jwt-token-abc123', // Keep dummy token for now
+        userId: user.id, // Explicitly pass the user ID for frontend use
+      });
     } catch (error) {
       // Catch UnauthorizedException from AuthService
       if (error instanceof UnauthorizedException) {
         return res.status(HttpStatus.UNAUTHORIZED).json({ message: error.message });
       }
-      // Handle other potential errors
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'An unexpected error occurred during login.' });
+      // Handle other potential errors, casting error to Error to access .message
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: (error as Error).message || 'An unexpected error occurred during login.' });
     }
   }
 
