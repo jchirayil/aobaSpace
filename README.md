@@ -1,4 +1,4 @@
-# AobaSpace: Platform Core (Project 1)
+# AobaSpace: Platform Core
 
 This repository contains the foundational code for AobaSpace's Platform Core, divided into a Next.js/React frontend and a NestJS backend. This setup is designed for local development using VS Code and Docker Compose.
 
@@ -25,7 +25,7 @@ Before you begin, ensure you have the following installed:
 ## Setup Instructions
 
 1.  **Clone the Repository (or create the structure manually):**
-    If you're starting from scratch, create the `aobaspace` root folder and the `aobaspace-web`, `aobaspace-api`, and `.vscode` subfolders. Then, create the files as specified in the previous output.
+    If you're starting from scratch, create the `aobaspace` root folder and the `aobaspace-web`, `aobaspace-api`, and `.vscode` subfolders. Then, create the files as specified in the project structure.
 
 2.  **Navigate to the root directory:**
     ```bash

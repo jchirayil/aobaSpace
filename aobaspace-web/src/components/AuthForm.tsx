@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link'; // Import Link for navigation
 import { useRouter } from 'next/navigation'; // Import useRouter
+import { API_BASE_URL } from '@/config/app.config'; // NEW: Import API_BASE_URL
 
 interface AuthFormProps {
   isRegisterMode: boolean; // Prop to determine if it's register or login mode

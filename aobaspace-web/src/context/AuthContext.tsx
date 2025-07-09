@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation'; // Import useRouter
+import { API_BASE_URL } from '@/config/app.config'; // NEW: Import API_BASE_URL
 
 // Define the shape of our authentication context
 interface AuthContextType {
@@ -46,8 +47,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      // Corrected API endpoint to http://localhost:3000
-      const response = await fetch('http://localhost:3000/api/auth/login', {
+      // Corrected API endpoint using API_BASE_URL
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -73,8 +74,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const register = async (email: string, password: string) => {
     try {
-      // Corrected API endpoint to http://localhost:3000
-      const response = await fetch('http://localhost:3000/api/auth/register', {
+      // Corrected API endpoint using API_BASE_URL
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

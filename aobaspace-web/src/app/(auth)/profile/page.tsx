@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import ImageWithFallback from '@/components/ImageWithFallback'; // Assuming you have this component
 import { useRouter } from 'next/navigation';
+import { API_BASE_URL } from '@/config/app.config'; // NEW: Import API_BASE_URL
 
 const ProfilePage = () => {
   const { userId, isLoggedIn, logout } = useAuth(); // Changed from token to userId
@@ -26,7 +27,7 @@ const ProfilePage = () => {
 
       try {
         // Use the actual userId from context
-        const userResponse = await fetch(`http://localhost:3000/api/users/${userId}`, { // Use userId
+        const userResponse = await fetch(`${API_BASE_URL}/users/${userId}`, { // Use API_BASE_URL
           headers: {
             // 'Authorization': `Bearer ${token}`, // If using JWT, this would be the actual JWT
             'Content-Type': 'application/json',
@@ -39,7 +40,7 @@ const ProfilePage = () => {
         setUserData(userJson);
 
         // Fetch personal organization for the user
-        const orgResponse = await fetch(`http://localhost:3000/api/organizations/user/${userId}`, { // Use userId
+        const orgResponse = await fetch(`${API_BASE_URL}/organizations/user/${userId}`, { // Use API_BASE_URL
           headers: {
             // 'Authorization': `Bearer ${token}`, // If using JWT, this would be the actual JWT
             'Content-Type': 'application/json',
