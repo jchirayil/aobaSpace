@@ -7,37 +7,32 @@ import { useAuth } from '@/context/AuthContext'; // Import useAuth hook
 import navigationData from '@/config/navigation.json'; // Import navigation data
 
 // Define types for navigation items for better type safety
-interface NavLinkItem {
+interface BaseNavItem {
   name: string;
+  className?: string;
+  protected?: boolean; // Can apply to any item that needs authentication check
+}
+
+interface LinkItem extends BaseNavItem {
+  type: "link" | "unauthenticated-link"; // Specific types for links
   href: string;
-  protected?: boolean; // Optional, indicates if link requires authentication
-  className?: string; // Optional, for custom CSS classes
 }
 
-interface DropdownItem {
-  name: string;
-  type: 'dropdown';
-  protected?: boolean; // Optional, indicates if dropdown itself requires authentication
-  children: (NavLinkItem | ActionItem)[]; // Can contain links or action items
-  className?: string;
+interface ActionItem extends BaseNavItem {
+  type: "action";
+  action: "logout"; // Literal type for specific actions
 }
 
-interface ActionItem {
-  name: string;
-  action: 'logout'; // Specific action for logout (literal type)
-  protected?: boolean; // Optional protected property for action items
-  className?: string;
+interface DropdownItem extends BaseNavItem {
+  type: "dropdown";
+  children: NavItem[]; // Recursive definition
 }
 
-type NavItem = NavLinkItem | DropdownItem | ActionItem;
+type NavItem = LinkItem | ActionItem | DropdownItem;
 
 // Define the structure of the imported JSON data
 interface NavigationData {
   mainNav: NavItem[]; // Changed to NavItem[] to include dropdowns
-  authNav: NavLinkItem[];
-  unauthenticatedAction: NavLinkItem;
-  authenticatedAction: ActionItem;
-  accountDropdown: DropdownItem; // NEW: Added accountDropdown
 }
 
 const Navbar = () => {
@@ -75,125 +70,117 @@ const Navbar = () => {
     };
   }, []);
 
-  // Helper to render a single navigation item
-  const renderNavItem = (item: NavItem, isMobile: boolean = false, isDropdownItem: boolean = false) => {
-    // Check if the item should be rendered based on authentication status
+  // Helper to render a single navigation item (can be recursive for dropdowns)
+  const renderNavItem = (item: NavItem, isMobile: boolean = false, isDropdownChild: boolean = false) => {
+    // Conditional rendering based on 'protected' and 'type'
     if (item.protected && !isLoggedIn) {
-      return null;
+      return null; // Don't render protected items if not logged in
+    }
+    if (item.type === "unauthenticated-link" && isLoggedIn) {
+      return null; // Don't render login/signup if already logged in
+    }
+    if (item.type === "action" && item.action === 'logout' && !isLoggedIn) {
+      return null; // Don't render logout if not logged in
     }
 
-    // Base classes for dropdown items to ensure consistent padding and font weight
-    // Apply px-4 py-2 for all dropdown items to ensure consistent padding
-    const dropdownBaseClasses = isDropdownItem ? 'px-4 py-2 font-normal' : '';
+    // Determine base classes for styling
+    const baseClasses = `block transition-colors ${isMobile ? 'py-2' : 'text-lg'} ${item.className || ''}`;
+    const dropdownItemClasses = isDropdownChild ? 'px-4 py-2 font-normal text-white hover:bg-gray-600' : '';
+    const activeLinkClasses = pathname === ('href' in item ? item.href : '') ? 'font-bold text-blue-400' : '';
 
-    if ('href' in item) { // It's a regular link
+    if (item.type === "link" || item.type === "unauthenticated-link") {
+      const linkItem = item as LinkItem; // Type assertion for type narrowing
       return (
         <Link
-          href={item.href}
-          className={`block transition-colors ${
-            isMobile ? 'py-2' : 'text-lg' // Mobile links are full height, desktop links have specific font size
-          } ${
-            pathname === item.href
-              ? 'font-bold text-blue-400' // Active link styling
-              : `${isDropdownItem ? 'text-white hover:bg-gray-600' : 'text-white hover:text-gray-300'}` // Normal vs. dropdown item styling
-          } ${dropdownBaseClasses} ${item.className || ''}`} // Apply dropdown specific classes
+          href={linkItem.href}
+          className={`${baseClasses} ${dropdownItemClasses} ${activeLinkClasses} ${isDropdownChild ? '' : 'hover:text-gray-300'}`}
           onClick={() => {
             if (isMobile) setIsMobileMenuOpen(false);
             setIsDropdownOpen(false);
           }}
         >
-          {item.name}
+          {linkItem.name}
         </Link>
       );
-    } else if ('action' in item && item.action === 'logout') { // It's a logout action
+    } else if (item.type === "action" && item.action === "logout") {
+      const actionItem = item as ActionItem; // Type assertion for type narrowing
       return (
         <button
           onClick={handleLogoutClick}
-          className={`block w-full text-left transition-colors ${
-            isMobile ? 'py-2' : 'text-lg' // Mobile buttons are full height, desktop buttons have specific font size
-          } ${dropdownBaseClasses} text-white hover:bg-gray-600 ${item.className || ''}`} // Apply dropdown specific classes
+          className={`${baseClasses} ${dropdownItemClasses} w-full text-left`}
         >
-          {item.name}
+          {actionItem.name}
         </button>
       );
-    } else if ('type' in item && item.type === 'dropdown') { // It's a dropdown menu
-      return (
-        <li className="relative" ref={dropdownRef} key={item.name}>
-          <button
-            onClick={toggleDropdown}
-            className="text-lg hover:text-gray-300 transition-colors focus:outline-none"
-            aria-label={`Toggle ${item.name} menu`}
-          >
-            {item.name}
-            <svg
-              className={`w-4 h-4 ml-1 inline-block transition-transform duration-200 ${
-                isDropdownOpen ? 'rotate-180' : ''
-              }`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)"
+    } else if (item.type === "dropdown") {
+      const dropdownItem = item as DropdownItem; // Type assertion for type narrowing
+
+      // Filter children based on authentication status before mapping
+      const filteredChildren = dropdownItem.children.filter(childItem => {
+        if (childItem.protected && !isLoggedIn) return false;
+        if (childItem.type === "unauthenticated-link" && isLoggedIn) return false;
+        if (childItem.type === "action" && childItem.action === 'logout' && !isLoggedIn) return false;
+        return true;
+      });
+
+      // For desktop, render as a dropdown with its own button and nested div
+      if (!isMobile) {
+        return (
+          <li className="relative" ref={dropdownRef} key={dropdownItem.name}>
+            <button
+              onClick={toggleDropdown}
+              className="text-lg hover:text-gray-300 transition-colors focus:outline-none"
+              aria-label={`Toggle ${dropdownItem.name} menu`}
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </button>
-          {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-gray-700 rounded-md shadow-lg py-1 z-50">
-              {/* Render children of the dropdown */}
-              {renderDropdownContent(item.children, isMobile)}
-            </div>
-          )}
-        </li>
-      );
+              {dropdownItem.name}
+              <svg
+                className={`w-4 h-4 ml-1 inline-block transition-transform duration-200 ${
+                  isDropdownOpen ? 'rotate-180' : ''
+                }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-gray-700 rounded-md shadow-lg py-1 z-50">
+                {filteredChildren.map((childItem, idx, arr) => ( // Use filteredChildren here, and get 'arr' for length
+                  <React.Fragment key={childItem.name}>
+                    {renderNavItem(childItem, isMobile, true)} {/* Recursive call for children */}
+                    {/* Add a divider only if there's more than one *visible* item AND it's not the last item */}
+                    {arr.length > 1 && idx < arr.length - 1 && (
+                      <div className="border-t border-gray-600 my-1"></div>
+                    )}
+                  </React.Fragment>
+                ))}
+              </div>
+            )}
+          </li>
+        );
+      } else {
+        // For mobile, render dropdown children directly as flat list items
+        return (
+          <>
+            {filteredChildren.map((childItem, idx, arr) => ( // Use filteredChildren here, and get 'arr' for length
+              <React.Fragment key={childItem.name}>
+                {renderNavItem(childItem, isMobile, true)}
+                {arr.length > 1 && idx < arr.length - 1 && (
+                  <div className="border-t border-gray-600 my-2"></div>
+                )}
+              </React.Fragment>
+            ))}
+          </>
+        );
+      }
     }
     return null; // Should not happen with well-defined types
   };
 
-  // Helper to render dropdown content
-  const renderDropdownContent = (items: (NavLinkItem | ActionItem)[], isMobile: boolean) => (
-    <>
-      {items.map((item, idx) => {
-        // Filter dropdown items based on authentication status
-        if (item.protected && !isLoggedIn) {
-          return null;
-        }
-        // Special handling for unauthenticated/authenticated actions within the dropdown
-        if (item.name === navigationData.unauthenticatedAction.name && isLoggedIn) {
-          return null; // Don't show login/signup if logged in
-        }
-        if (item.name === navigationData.authenticatedAction.name && !isLoggedIn) {
-          return null; // Don't show logout if not logged in
-        }
-
-        return (
-          <React.Fragment key={item.name}>
-            {renderNavItem(item, isMobile, true)} {/* Pass true for isDropdownItem */}
-            {/* Add a divider before logout if it's the last item in authNav */}
-            {'action' in item && item.action === 'logout' && idx === items.length - 1 && <div className="border-t border-gray-600 my-1"></div>}
-          </React.Fragment>
-        );
-      })}
-    </>
-  );
-
   // Cast navigationData to the new NavigationData interface
   const typedNavigationData = navigationData as NavigationData;
-
-  // Prepare the dynamic account dropdown children based on login status
-  const accountDropdownChildren = isLoggedIn
-    ? [...typedNavigationData.authNav, typedNavigationData.authenticatedAction]
-    : [typedNavigationData.unauthenticatedAction];
-
-  // Create a dynamic account dropdown item
-  const dynamicAccountDropdown: DropdownItem = {
-    ...typedNavigationData.accountDropdown,
-    children: accountDropdownChildren,
-    protected: false // The dropdown itself is not protected, its children are
-  };
-
-
-  // Filter main navigation links based on authentication status and include the dynamic account dropdown
-  const filteredMainNav = typedNavigationData.mainNav.filter(link => !link.protected || isLoggedIn);
 
   return (
     <nav className="bg-gray-800 p-4 text-white shadow-lg fixed top-0 left-0 w-full z-50">
@@ -223,13 +210,11 @@ const Navbar = () => {
 
         {/* Desktop Navigation Links */}
         <ul className="hidden md:flex space-x-6 items-center">
-          {filteredMainNav.map((link) => (
-            <li key={link.name}>
-              {renderNavItem(link)}
-            </li>
+          {typedNavigationData.mainNav.map((item) => (
+            // Render top-level items. renderNavItem will handle <li> for dropdowns.
+            // For other types (links), wrap them in <li> here.
+            item.type === 'dropdown' ? renderNavItem(item) : <li key={item.name}>{renderNavItem(item)}</li>
           ))}
-          {/* Render the dynamic account dropdown using renderNavItem */}
-          {renderNavItem(dynamicAccountDropdown)}
         </ul>
       </div>
 
@@ -248,13 +233,12 @@ const Navbar = () => {
             </svg>
           </button>
           <ul className="flex flex-col space-y-6 text-xl">
-            {filteredMainNav.map((link) => (
-              <li key={link.name}>
-                {renderNavItem(link, true)}
+            {typedNavigationData.mainNav.map((item) => (
+              <li key={item.name}>
+                {/* For mobile, if it's a dropdown, render its children directly */}
+                {item.type === 'dropdown' ? renderNavItem(item, true) : renderNavItem(item, true)}
               </li>
             ))}
-            {/* Render the dynamic account dropdown's children directly in mobile menu */}
-            {renderDropdownContent(dynamicAccountDropdown.children, true)}
           </ul>
         </div>
       )}

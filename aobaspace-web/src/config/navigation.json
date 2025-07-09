@@ -2,49 +2,59 @@
   "mainNav": [
     {
       "name": "Home",
-      "href": "/"
+      "href": "/",
+      "type": "link"
     },
     {
       "name": "About",
-      "href": "/about"
+      "href": "/about",
+      "type": "link"
     },
     {
       "name": "Contact",
-      "href": "/contact"
+      "href": "/contact",
+      "type": "link"
+    },
+    {
+      "name": "Your Account",
+      "type": "dropdown",
+      "children": [
+        {
+          "name": "Login / Sign Up",
+          "href": "/login",
+          "type": "unauthenticated-link"
+        },
+        {
+          "name": "Dashboard",
+          "href": "/dashboard",
+          "type": "link",
+          "protected": true
+        },
+        {
+          "name": "Profile",
+          "href": "/profile",
+          "type": "link",
+          "protected": true
+        },
+        {
+          "name": "Settings",
+          "href": "/settings",
+          "type": "link",
+          "protected": true
+        },
+        {
+          "name": "Billing",
+          "href": "/billing",
+          "type": "link",
+          "protected": true
+        },
+        {
+          "name": "Logout",
+          "action": "logout",
+          "type": "action",
+          "protected": true
+        }
+      ]
     }
-  ],
-  "authNav": [
-    {
-      "name": "Dashboard",
-      "href": "/dashboard",
-      "protected": true
-    },
-    {
-      "name": "Profile",
-      "href": "/profile",
-      "protected": true
-    },
-    {
-      "name": "Settings",
-      "href": "/settings",
-      "protected": true
-    },
-    {
-      "name": "Billing",
-      "href": "/billing",
-      "protected": true
-    }
-  ],
-  "unauthenticatedAction": {
-    "name": "Login / Sign Up",
-    "href": "/login"
-  },
-  "authenticatedAction": {
-    "name": "Logout",
-    "action": "logout"
-  },
-  "accountDropdown": {
-    "name": "Your Account",
-    "type": "dropdown"
-  }
+  ]
 }
