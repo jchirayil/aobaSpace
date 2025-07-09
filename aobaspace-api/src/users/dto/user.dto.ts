@@ -39,11 +39,11 @@ export class UpdateUserProfileDto {
   avatarUrl?: string; // URL to the avatar image
 }
 
-// DTO for updating a UserPassword (e.g., changing password)
+// NEW: DTO for updating a UserPassword (e.g., changing password)
 export class UpdateUserPasswordDto {
   @IsString()
   @IsNotEmpty()
-  oldPassword?: string; // Required for changing password
+  oldPassword: string; // Required for changing password
 
   @IsString()
   @IsNotEmpty()
@@ -91,4 +91,11 @@ export class AddUserToOrganizationDto {
   @IsString()
   @IsNotEmpty()
   role: string; // e.g., 'admin', 'member'
+}
+
+// NEW: DTO for updating a user's role within an organization
+export class UpdateUserOrganizationRoleDto {
+  @IsString()
+  @IsNotEmpty()
+  role: string; // The new role for the user in the organization
 }

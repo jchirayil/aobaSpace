@@ -59,7 +59,7 @@ export class AuthService {
     }
 
     // Create UserAccount
-    const newUserAccount = await this.usersService.createUserAccount({
+    const newUserAccount = this.usersService.createUserAccount({
       username: userData.email,
       email: userData.email,
       isEnabled: true,
@@ -69,8 +69,8 @@ export class AuthService {
     // If password is provided, hash and store it
     if (userData.password) {
       const hashedPassword = await bcrypt.hash(userData.password, 10); // Hash with salt rounds = 10
-      await this.usersService.createUserPassword({
-        userAccountId: newUserAccount.id,
+      this.usersService.createUserPassword({
+        userAccountId: (await newUserAccount).id,
         hashedPassword: hashedPassword,
         enabledFromDate: new Date(),
         isActive: true,
@@ -78,8 +78,8 @@ export class AuthService {
     }
 
     // Create UserProfile (can be empty initially)
-    await this.usersService.createUserProfile({
-      userAccountId: newUserAccount.id,
+    this.usersService.createUserProfile({
+      userAccountId: (await newUserAccount).id,
       firstName: null, // Can be collected later
       lastName: null, // Can be collected later
       avatarUrl: null, // Can be set later
@@ -87,14 +87,14 @@ export class AuthService {
 
     // Create a default "Personal" organization for the new user
     const personalOrg = await this.organizationsService.createOrganization({
-      name: `${newUserAccount.username}'s Personal Org`, // Unique name for personal org
+      name: `${(await newUserAccount).username}'s Personal Org`, // Unique name for personal org
       isEnabled: true,
       description: 'Your personal workspace.',
     });
 
     // Link user to their personal organization with 'admin' role
     await this.organizationsService.addUserToOrganization(
-      newUserAccount.id,
+      (await newUserAccount).id,
       personalOrg.id,
       'admin'
     );

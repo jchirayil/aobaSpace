@@ -16,6 +16,9 @@ export class UserOrganization {
   @Column({ default: true })
   isActive: boolean; // Indicates if the user's membership in this org is active
 
+  @Column({ type: 'timestamp', nullable: true }) // NEW: Timestamp when the membership was disabled
+  disabledOnDate?: Date;
+
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 

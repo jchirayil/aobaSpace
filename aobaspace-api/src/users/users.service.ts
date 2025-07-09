@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common'; // NEW: Import NotFoundException
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserAccount } from './entities/user_account.entity'; // NEW
 import { UserProfile } from './entities/user_profile.entity'; // NEW
 import { UserPassword } from './entities/user_password.entity'; // NEW
 import { generateUniqueId } from '../common/utils'; // NEW: Import ID generator
+import * as bcrypt from 'bcryptjs'; // NEW: Import bcrypt for password hashing
 
 @Injectable()
 export class UsersService {
@@ -79,33 +80,84 @@ export class UsersService {
     return this.userPasswordRepository.findOne({ where: { userAccountId } });
   }
 
-  async updateUserPassword(userAccountId: string, updateData: Partial<UserPassword>): Promise<UserPassword | undefined> {
-    await this.userPasswordRepository.update({ userAccountId }, updateData);
+  /**
+   * Updates a user's password after validating the old password.
+   * @param userAccountId The ID of the user account.
+   * @param oldPassword The current plain-text password.
+   * @param newPassword The new plain-text password.
+   * @returns The updated UserPassword entity or undefined if not found/invalid.
+   * @throws UnauthorizedException if old password does not match.
+   */
+  async updateUserPassword(userAccountId: string, oldPassword: string, newPassword: string): Promise<UserPassword | undefined> {
+    const userPassword = await this.findUserPasswordByAccountId(userAccountId);
+
+    if (!userPassword || !userPassword.hashedPassword) {
+      throw new UnauthorizedException('Password not set for this account or invalid user.');
+    }
+
+    const isOldPasswordValid = await bcrypt.compare(oldPassword, userPassword.hashedPassword);
+
+    if (!isOldPasswordValid) {
+      throw new UnauthorizedException('Old password does not match.');
+    }
+
+    const newHashedPassword = await bcrypt.hash(newPassword, 10); // Hash with salt rounds = 10
+    await this.userPasswordRepository.update({ userAccountId }, { hashedPassword: newHashedPassword });
     return this.findUserPasswordByAccountId(userAccountId);
+  }
+
+  /**
+   * Simulates forcing a password reset for a user by sending an email link.
+   * In a real application, this would generate a reset token and send an email.
+   * @param userAccountId The ID of the user account.
+   * @returns A message indicating the action.
+   */
+  async forceUserPasswordReset(userAccountId: string): Promise<{ message: string }> {
+    const userAccount = await this.findUserAccountById(userAccountId);
+    if (!userAccount) {
+      throw new NotFoundException(`User with ID "${userAccountId}" not found.`);
+    }
+    // Dummy implementation: In a real app, generate a token, save it, and send an email.
+    console.log(`[DUMMY] Password reset link sent to ${userAccount.email} for user ID: ${userAccountId}`);
+    return { message: `Password reset link simulated sent to ${userAccount.email}.` };
   }
 
   // --- Combined User Data Retrieval (for profile page) ---
   async getFullUserProfile(userAccountId: string): Promise<any> {
-    const userAccount = await this.findUserAccountById(userAccountId);
+    const userAccount = await this.userAccountRepository.findOne({
+      where: { id: userAccountId },
+      relations: ['profile', 'userOrganizations', 'userOrganizations.organization'], // Eager load profile and organizations
+    });
+
     if (!userAccount) {
       return null;
     }
-    const userProfile = await this.findUserProfileByAccountId(userAccountId);
+
+    // Map userOrganizations to include organization details and user's role
+    const organizations = userAccount.userOrganizations.map(uo => ({
+      id: uo.organization.id,
+      name: uo.organization.name,
+      description: uo.organization.description,
+      role: uo.role,
+      isActive: uo.isActive,
+    }));
+
 
     return {
       id: userAccount.id,
       username: userAccount.username,
       email: userAccount.email,
-      firstName: userProfile?.firstName || null,
-      lastName: userProfile?.lastName || null,
-      avatarUrl: userProfile?.avatarUrl || null,
+      firstName: userAccount.profile?.firstName || null,
+      lastName: userAccount.profile?.lastName || null,
+      avatarUrl: userAccount.profile?.avatarUrl || null,
       ssoProvider: userAccount.ssoProvider || null,
       ssoId: userAccount.ssoId || null,
       isEnabled: userAccount.isEnabled,
-      enabledFromDate: userAccount.enabledFromDate, // Include enabledFromDate
-      disabledOnDate: userAccount.disabledOnDate,   // Include disabledOnDate
+      enabledFromDate: userAccount.enabledFromDate,
+      disabledOnDate: userAccount.disabledOnDate,
       createdAt: userAccount.createdAt,
       updatedAt: userAccount.updatedAt,
+      organizations: organizations, // Include organizations in the user profile
     };
   }
 

@@ -1,6 +1,6 @@
 'use client'; // This is a Client Component
 
-import React from 'react';
+import React, { useState, useEffect } from 'react'; // NEW: Import useEffect
 import ImageWithFallback from '@/components/ImageWithFallback';
 // Removed LoginRegisterForm import
 import { useAuth } from '@/context/AuthContext';
@@ -15,6 +15,12 @@ interface HomePageClientContentProps {
 const HomePageClientContent: React.FC<HomePageClientContentProps> = ({ markdownData, markdownSections }) => {
   const { isLoggedIn } = useAuth();
   // Removed showAuthForm and setShowAuthForm from context
+  const [mounted, setMounted] = useState(false); // NEW: State to track if component is mounted on client
+
+  // NEW: Set mounted to true after component mounts on the client
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   if (!markdownData) {
     return (
@@ -37,7 +43,8 @@ const HomePageClientContent: React.FC<HomePageClientContentProps> = ({ markdownD
               <p className="text-xl md:text-2xl mb-8 opacity-90">
                 {markdownData.heroSubtitle}
               </p>
-              {!isLoggedIn && ( // Only show button if not logged in
+              {/* Only show button if mounted on client AND not logged in */}
+              {mounted && !isLoggedIn && (
                 <Link
                   href="/login" // Changed to Link to login page
                   className="bg-white text-blue-700 hover:bg-blue-100 font-bold py-3 px-8 rounded-full text-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
@@ -92,7 +99,8 @@ const HomePageClientContent: React.FC<HomePageClientContentProps> = ({ markdownD
               <p className="text-xl md:text-2xl mb-8 opacity-90">
                 {markdownData.ctaSubtitle}
               </p>
-              {!isLoggedIn && ( // Only show button if not logged in
+              {/* Only show button if mounted on client AND not logged in */}
+              {mounted && !isLoggedIn && (
                 <Link
                   href="/login" // Changed to Link to login page
                   className="bg-white text-blue-700 hover:bg-blue-100 font-bold py-3 px-8 rounded-full text-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 mt-8"

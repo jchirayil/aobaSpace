@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Body, Param, Put, Delete, NotFoundException } from '@nestjs/common'; // Import NotFoundException
+import { Controller, Get, Post, Body, Param, Put, Delete, NotFoundException, UnauthorizedException } from '@nestjs/common'; // Import NotFoundException, UnauthorizedException
 import { UsersService } from './users.service';
-import { CreateUserAccountDto, UpdateUserProfileDto } from './dto/user.dto'; // NEW: Import DTOs
+import { CreateUserAccountDto, UpdateUserProfileDto, UpdateUserPasswordDto } from './dto/user.dto'; // NEW: Import DTOs
 
 @Controller('api/users')
 export class UsersController {
@@ -26,12 +26,36 @@ export class UsersController {
     return updatedProfile;
   }
 
-  // Note: Standard create, find, update, remove operations for UserAccount
-  // are largely handled by AuthService for registration/login.
-  // Direct CRUD for UserAccount/UserProfile/UserPassword might be limited
-  // to internal admin tools or specific flows.
-  // For now, we'll keep the basic findOne and findAll from previous version
-  // but they will operate on UserAccount entity.
+  // NEW: Endpoint to change user password
+  @Put(':id/password')
+  async updateUserPassword(@Param('id') id: string, @Body() updateUserPasswordDto: UpdateUserPasswordDto) {
+    try {
+      const updatedPassword = await this.usersService.updateUserPassword(
+        id,
+        updateUserPasswordDto.oldPassword,
+        updateUserPasswordDto.newPassword
+      );
+      if (!updatedPassword) {
+        throw new NotFoundException(`User password for ID "${id}" not found`);
+      }
+      return { message: 'Password updated successfully.' };
+    } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        throw error; // Re-throw UnauthorizedException with its message
+      }
+      throw new UnauthorizedException('Failed to update password.'); // Generic error for others
+    }
+  }
+
+  // NEW: Endpoint to force a password reset (admin action, sends email link)
+  @Post(':id/force-password-reset')
+  async forcePasswordReset(@Param('id') id: string) {
+    // TODO: Implement actual admin role check here (e.g., using @RolesGuard)
+    // if (!req.user.isAdmin) {
+    //   throw new UnauthorizedException('Only administrators can force password resets.');
+    // }
+    return this.usersService.forceUserPasswordReset(id);
+  }
 
   // This method would typically be used by an internal admin, not directly by frontend registration
   @Post()
