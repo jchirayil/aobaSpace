@@ -1,0 +1,50 @@
+{
+  "mainNav": [
+    {
+      "name": "Home",
+      "href": "/"
+    },
+    {
+      "name": "About",
+      "href": "/about"
+    },
+    {
+      "name": "Contact",
+      "href": "/contact"
+    }
+  ],
+  "authNav": [
+    {
+      "name": "Dashboard",
+      "href": "/dashboard",
+      "protected": true
+    },
+    {
+      "name": "Profile",
+      "href": "/profile",
+      "protected": true
+    },
+    {
+      "name": "Settings",
+      "href": "/settings",
+      "protected": true
+    },
+    {
+      "name": "Billing",
+      "href": "/billing",
+      "protected": true
+    }
+  ],
+  "unauthenticatedAction": {
+    "name": "Login / Sign Up",
+    "href": "/login"
+  },
+  "authenticatedAction": {
+    "name": "Logout",
+    "action": "logout"
+  },
+  "accountDropdown": {
+    "name": "Your Account",
+    "type": "dropdown"
+  }
+}
