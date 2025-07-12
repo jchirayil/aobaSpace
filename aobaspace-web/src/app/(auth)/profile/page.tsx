@@ -182,7 +182,7 @@ const ProfilePage = () => {
       await fetch(`${API_BASE_URL}/organizations/${newOrg.id}/users`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, role: 'admin' }),
+        body: JSON.stringify({ userId: userId, role: 'admin' }),
       });
 
       setOrgMessage('Organization added successfully!');
@@ -241,19 +241,21 @@ const ProfilePage = () => {
     }
 
     try {
-      // First, find the user ID by email (this would ideally be an admin API endpoint)
-      // For now, we'll simulate or assume the inviteEmail is directly the userId if it matches the format
-      // In a real app, you'd have a backend endpoint to look up user by email.
-      const allUsersResponse = await fetch(`${API_BASE_URL}/users`); // Admin endpoint
-      if (!allUsersResponse.ok) throw new Error('Failed to fetch all users for invite lookup');
-      const allUsers = await allUsersResponse.json();
-      const userToInvite = allUsers.find((u: any) => u.email === inviteEmail);
+      // Use the new secure endpoint to find a user by email
+      const findUserResponse = await fetch(`${API_BASE_URL}/users/find-by-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: inviteEmail }),
+      });
 
-      if (!userToInvite) {
-        setInviteError('User with this email does not exist.');
-        return;
+      if (!findUserResponse.ok) {
+        if (findUserResponse.status === 404) {
+          throw new Error(`User with email "${inviteEmail}" not found.`);
+        }
+        const errData = await findUserResponse.json();
+        throw new Error(errData.message || 'Failed to find user by email');
       }
-
+      const userToInvite = await findUserResponse.json();
       const response = await fetch(`${API_BASE_URL}/organizations/${selectedOrgId}/users`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

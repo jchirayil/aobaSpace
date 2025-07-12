@@ -3,21 +3,21 @@ import type { NextRequest } from 'next/server';
 
 // This middleware runs before a request is completed.
 // It's used here to protect routes that require authentication.
+// IMPORTANT: The current implementation is for demonstration only and is NOT secure.
 export function middleware(request: NextRequest) {
-  // Get the 'isLoggedIn' cookie. In a real app, this would be a secure session token or JWT.
-  const isLoggedIn = request.cookies.get('isLoggedIn')?.value === 'true';
-  const pathname = request.nextUrl.pathname;
+  // In a real application, you would get a secure, httpOnly session cookie.
+  // You would then verify this token (e.g., a JWT) against a secret or by calling an auth service.
+  // The 'isLoggedIn' cookie is insecure because it can be easily manipulated by the client.
+  const sessionToken = request.cookies.get('session-token')?.value;
+  const isLoggedIn = !!sessionToken; // TODO: Replace with actual token validation logic
 
-  // Define protected routes using a regex or an array of paths
-  // Any path under '/dashboard' (due to the (auth) route group) will be protected
-  const protectedPaths = ['/dashboard', '/profile', '/settings', '/billing']; // Added new protected paths
-
-  // Check if the current path is protected and the user is NOT logged in
-  if (protectedPaths.some(path => pathname.startsWith(path)) && !isLoggedIn) {
+  // Since the matcher is configured to only run on protected routes,
+  // we can directly check for the authentication status.
+  if (!isLoggedIn) {
     // Redirect unauthenticated users to the home page or a login page
-    // For now, redirect to home. In a real app, you'd redirect to /login
+    // In a real app, you'd redirect to /login
     const url = request.nextUrl.clone();
-    url.pathname = '/'; // Redirect to home
+    url.pathname = '/login'; // Redirect to a dedicated login page
     return NextResponse.redirect(url);
   }
 
@@ -26,8 +26,9 @@ export function middleware(request: NextRequest) {
 }
 
 // Define which paths the middleware should apply to
-// This matcher will apply the middleware to all routes within the (auth) group
-// and any other specific paths you want to protect.
+// This matcher is scoped to only the routes that require authentication.
+// This avoids running the middleware on public pages (like the homepage,
+// privacy policy, etc.) for better performance.
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'], // Apply to all paths except static assets and API routes
+  matcher: ['/dashboard/:path*', '/profile/:path*', '/settings/:path*', '/billing/:path*'],
 };

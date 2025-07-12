@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Param, Put, Delete, NotFoundException, UnauthorizedException } from '@nestjs/common'; // Import NotFoundException, UnauthorizedException
 import { UsersService } from './users.service';
-import { CreateUserAccountDto, UpdateUserProfileDto, UpdateUserPasswordDto } from './dto/user.dto'; // NEW: Import DTOs
+import { CreateUserAccountDto, UpdateUserProfileDto, UpdateUserPasswordDto, FindUserByEmailDto } from './dto/user.dto'; // NEW: Import DTOs
 
 @Controller('api/users')
 export class UsersController {
@@ -63,11 +63,24 @@ export class UsersController {
     return this.usersService.createUserAccount(createUserAccountDto);
   }
 
-  // This finds a user account by its generated ID, not username
-  @Get()
-  async findAllUserAccounts() {
-    // This would typically return all user accounts, might need pagination/filtering
-    // For simplicity, returning all for now.
-    return this.usersService.findAllUserAccounts(); // Corrected to call public method
+  // DEPRECATED: This endpoint is insecure as it exposes all users.
+  // It has been replaced by the more secure `find-by-email` endpoint.
+  // @Get()
+  // async findAllUserAccounts() {
+  //   // This would typically return all user accounts, might need pagination/filtering
+  //   // For simplicity, returning all for now.
+  //   return this.usersService.findAllUserAccounts();
+  // }
+
+  // NEW: Endpoint to find a user by email (for invite flows, etc.)
+  // This is a POST to avoid leaking user emails via GET request query params in server logs.
+  @Post('find-by-email')
+  async findUserByEmail(@Body() findUserByEmailDto: FindUserByEmailDto) {
+    // TODO: Add authorization. Only an admin of an organization should be able to look up users.
+    // This might be better placed under /api/organizations/:orgId/users/find-by-email
+    // For now, any authenticated user can look up another user.
+    // The service method will throw a NotFoundException if the user doesn't exist,
+    // which is handled automatically by NestJS.
+    return this.usersService.findUserByEmail(findUserByEmailDto.email);
   }
 }

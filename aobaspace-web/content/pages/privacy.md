@@ -2,11 +2,11 @@
 title: Privacy Policy
 ---
 
-## Privacy Policy for AobaForms
+## Privacy Policy for AobaSpace
 
-**Last updated: July 5, 2025**
+**Last updated: [Current Date]**
 
-AobaForms ("us," "we," or "our") operates the AobaForms platform (the "Service").
+AobaSpace ("us," "we," or "our") operates the AobaSpace platform (the "Service").
 
 This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our Service and the choices you have associated with that data.
 

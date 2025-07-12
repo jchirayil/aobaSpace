@@ -76,17 +76,18 @@ export class CreateOrganizationDto {
 // DTO for updating an Organization
 export class UpdateOrganizationDto extends PartialType(CreateOrganizationDto) {}
 
+// NEW: DTO for finding a user by email
+export class FindUserByEmailDto {
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+}
+
 // DTO for adding a user to an organization
 export class AddUserToOrganizationDto {
   @IsString()
   @IsNotEmpty()
-  @IsAlphanumeric()
   userId: string; // The fixed-length user account ID
-
-  @IsString()
-  @IsNotEmpty()
-  @IsAlphanumeric()
-  organizationId: string; // The fixed-length organization ID
 
   @IsString()
   @IsNotEmpty()

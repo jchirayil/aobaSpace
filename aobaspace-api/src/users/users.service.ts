@@ -161,8 +161,33 @@ export class UsersService {
     };
   }
 
-  // Public method to retrieve all user accounts
-  public async findAllUserAccounts(): Promise<UserAccount[]> { // Added explicit 'public'
-    return this.userAccountRepository.find();
+  // DEPRECATED: This method is insecure as it exposes all users.
+  // It has been replaced by the more secure `findUserByEmail` method.
+  // public async findAllUserAccounts(): Promise<UserAccount[]> {
+  //   return this.userAccountRepository.find();
+  // }
+
+  /**
+   * Finds a user by email and returns a sanitized version of their data.
+   * This is more secure than fetching all users on the frontend.
+   * @param email The email of the user to find.
+   * @returns A sanitized user object or throws NotFoundException.
+   */
+  async findUserByEmail(email: string): Promise<Partial<UserAccount>> {
+    const userAccount = await this.userAccountRepository.findOne({
+      where: { email },
+      relations: ['profile'],
+    });
+
+    if (!userAccount) {
+      throw new NotFoundException(`User with email "${email}" not found.`);
+    }
+
+    // Return a sanitized object, suitable for use in invite flows.
+    // It intentionally omits sensitive data like password hashes.
+    return {
+      id: userAccount.id,
+      email: userAccount.email,
+    };
   }
 }
