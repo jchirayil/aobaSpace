@@ -275,6 +275,12 @@ const ProfilePage = () => {
   };
 
   const handleViewOrgUsers = async () => {
+    // If the user list is already showing, this button should hide it.
+    if (isManagingOrgUsers) {
+      setIsManagingOrgUsers(false);
+      return;
+    }
+
     if (!selectedOrgId) {
       setOrgUsers([]);
       return;
@@ -384,8 +390,11 @@ const ProfilePage = () => {
   }
 
   const fullName = `${userData.firstName || ''} ${userData.lastName || ''}`.trim();
-  const isCurrentUserOrgAdmin = userData.organizations?.some((org: any) => org.id === selectedOrgId && org.role === 'admin');
-
+  // Determine the user's role in the currently selected organization
+  const currentUserOrganization = userData.organizations?.find((org: any) => org.id === selectedOrgId);
+  const isCurrentUserOrgAdmin = currentUserOrganization?.role === 'admin';
+  // Define which roles can edit organization details
+  const canEditOrgDetails = currentUserOrganization && ['admin', 'billing_admin', 'support_admin'].includes(currentUserOrganization.role);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-start p-4 md:p-12 bg-gray-100 text-gray-800">
@@ -550,12 +559,14 @@ const ProfilePage = () => {
                   {orgDetailsMessage && <p className="text-green-600 mb-2">{orgDetailsMessage}</p>}
                   {orgDetailsError && <p className="text-red-600 mb-2">{orgDetailsError}</p>}
 
-                  <button
-                    onClick={() => setIsEditingOrg(!isEditingOrg)}
-                    className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-200 mr-2 mb-4"
-                  >
-                    {isEditingOrg ? 'Cancel Edit Org Details' : 'Edit Organization Details'}
-                  </button>
+                  {canEditOrgDetails && (
+                    <button
+                      onClick={() => setIsEditingOrg(!isEditingOrg)}
+                      className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-200 mr-2 mb-4"
+                    >
+                      {isEditingOrg ? 'Cancel Edit Org Details' : 'Edit Organization Details'}
+                    </button>
+                  )}
                   {isCurrentUserOrgAdmin && (
                     <button
                       onClick={handleViewOrgUsers}
