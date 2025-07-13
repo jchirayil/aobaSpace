@@ -6,6 +6,11 @@ import { UserProfile } from '../users/entities/user_profile.entity'; // Correcte
 import { UserPassword } from '../users/entities/user_password.entity'; // NEW
 import { Organization } from '../users/entities/organization.entity'; // NEW
 import { UserOrganization } from '../users/entities/user_organization.entity'; // NEW
+import { Plan } from '../billing/entities/plan.entity';
+import { Subscription } from '../billing/entities/subscription.entity';
+import { PaymentProfile } from '../billing/entities/payment_profile.entity';
+import { Invoice } from '../billing/entities/invoice.entity';
+import { InvoiceLineItem } from '../billing/entities/invoice_line_item.entity';
 
 @Module({
   imports: [
@@ -25,6 +30,11 @@ import { UserOrganization } from '../users/entities/user_organization.entity'; /
             UserPassword,   // NEW
             Organization,   // NEW
             UserOrganization, // NEW
+            Plan,
+            Subscription,
+            PaymentProfile,
+            Invoice,
+            InvoiceLineItem,
           ],
           synchronize: true, // Auto-create tables (for development)
           logging: true, // Enable TypeORM logging

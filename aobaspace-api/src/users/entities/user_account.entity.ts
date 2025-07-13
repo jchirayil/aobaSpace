@@ -1,9 +1,18 @@
-import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, OneToOne, OneToMany } from 'typeorm'; // Removed JoinColumn from here
-import { UserProfile } from './user_profile.entity'; // NEW: Import UserProfile
-import { UserPassword } from './user_password.entity'; // NEW: Import UserPassword
-import { UserOrganization } from './user_organization.entity'; // NEW: Import UserOrganization
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToOne,
+  OneToMany,
+} from "typeorm"; // Removed JoinColumn from here
+import { UserProfile } from "./user_profile.entity"; // NEW: Import UserProfile
+import { UserPassword } from "./user_password.entity"; // NEW: Import UserPassword
+import { UserOrganization } from "./user_organization.entity"; // NEW: Import UserOrganization
+import { PaymentProfile } from "../../billing/entities/payment_profile.entity";
 
-@Entity('user_accounts')
+@Entity("user_accounts")
 export class UserAccount {
   @PrimaryColumn({ length: 10 }) // Fixed length for user ID (e.g., 'abc123defg')
   id: string;
@@ -23,25 +32,39 @@ export class UserAccount {
   @Column({ default: true })
   isEnabled: boolean;
 
-  @Column({ type: 'timestamp', nullable: true }) // Timestamp when the account was enabled
+  @Column({ type: "timestamp", nullable: true }) // Timestamp when the account was enabled
   enabledFromDate?: Date;
 
-  @Column({ type: 'timestamp', nullable: true }) // Timestamp when the account was disabled
+  @Column({ type: "timestamp", nullable: true }) // Timestamp when the account was disabled
   disabledOnDate?: Date;
 
-  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+  @UpdateDateColumn({
+    type: "timestamp",
+    default: () => "CURRENT_TIMESTAMP",
+    onUpdate: "CURRENT_TIMESTAMP",
+  })
   updatedAt: Date;
 
   // Relationships - Foreign keys are now defined on the *other* side (UserProfile, UserPassword)
-  @OneToOne(() => UserProfile, userProfile => userProfile.userAccount, { cascade: true })
+  @OneToOne(() => UserProfile, (userProfile) => userProfile.userAccount, {
+    cascade: true,
+  })
   profile: UserProfile;
 
-  @OneToOne(() => UserPassword, userPassword => userPassword.userAccount, { cascade: true })
+  @OneToOne(() => UserPassword, (userPassword) => userPassword.userAccount, {
+    cascade: true,
+  })
   password: UserPassword;
 
-  @OneToMany(() => UserOrganization, userOrganization => userOrganization.userAccount)
+  @OneToMany(
+    () => UserOrganization,
+    (userOrganization) => userOrganization.userAccount
+  )
   userOrganizations: UserOrganization[];
+
+  @OneToMany(() => PaymentProfile, (profile) => profile.userAccount)
+  paymentProfiles: PaymentProfile[];
 }

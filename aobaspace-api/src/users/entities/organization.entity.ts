@@ -1,5 +1,7 @@
-import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, OneToOne } from 'typeorm';
 import { UserOrganization } from './user_organization.entity'; // NEW: Import UserOrganization
+import { Subscription } from '../../billing/entities/subscription.entity';
+
 
 @Entity('organizations')
 export class Organization {
@@ -30,4 +32,8 @@ export class Organization {
   // Relationships
   @OneToMany(() => UserOrganization, userOrganization => userOrganization.organization)
   userOrganizations: UserOrganization[];
+
+  // An organization can have one subscription
+  @OneToOne(() => Subscription, (subscription) => subscription.organization)
+  subscription: Subscription;
 }
