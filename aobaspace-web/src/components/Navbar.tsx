@@ -140,7 +140,7 @@ const Navbar = () => {
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
-                xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)"
+                xmlns="http://www.w3.org/2000/svg"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
               </svg>
@@ -197,7 +197,7 @@ const Navbar = () => {
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
-              xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)"
+              xmlns="http://www.w3.org/2000/svg"
             >
               {isMobileMenuOpen ? (
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -227,18 +227,22 @@ const Navbar = () => {
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
-              xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)"
+              xmlns="http://www.w3.org/2000/svg"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
           </button>
-          <ul className="flex flex-col space-y-6 text-xl">
-            {typedNavigationData.mainNav.map((item) => (
-              <li key={item.name}>
-                {/* For mobile, if it's a dropdown, render its children directly */}
-                {item.type === 'dropdown' ? renderNavItem(item, true) : renderNavItem(item, true)}
-              </li>
-            ))}
+          <ul className="flex flex-col items-center space-y-6 text-xl w-full px-8">
+            {typedNavigationData.mainNav.flatMap((item) => {
+              // For mobile, we "unroll" dropdowns into a flat list.
+              if (item.type === 'dropdown') {
+                // renderNavItem for a mobile dropdown returns a React Fragment of its children.
+                // We map over those children and wrap each one in its own <li>.
+                const dropdownContent = renderNavItem(item, true) as React.ReactElement;
+                return React.Children.toArray(dropdownContent.props.children).map((child: any) => <li key={child.key}>{child}</li>);
+              }
+              return <li key={item.name}>{renderNavItem(item, true)}</li>;
+              })}
           </ul>
         </div>
       )}

@@ -8,9 +8,9 @@ import {
   UpdateDateColumn,
   OneToOne,
 } from "typeorm";
-import { Organization } from "../../users/entities/organization.entity";
+import { Organization } from "../../organizations/entities/organization.entity";
 import { Plan } from "./plan.entity";
-import { PaymentProfile } from "./payment_profile.entity";
+import { PaymentProfile } from "./payment-profile.entity";
 
 export enum SubscriptionStatus {
   TRIALING = "trialing",

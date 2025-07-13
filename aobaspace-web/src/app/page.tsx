@@ -1,5 +1,5 @@
 import React from 'react';
-import { getMarkdownPageContent } from '../../lib/markdown'; // This is a server-side import
+import { getMarkdownPageContent } from '@lib/markdown'; // This is a server-side import
 import HomePageClientContent from '@/components/HomePageClientContent'; // Import the new client component
 
 export default async function Home() {

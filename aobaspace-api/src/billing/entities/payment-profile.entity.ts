@@ -1,4 +1,4 @@
-import { UserAccount } from "../../users/entities/user_account.entity";
+import { UserAccount } from "../../users/entities/user-account.entity";
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -19,8 +19,10 @@ export class PaymentProfile {
   @Column()
   userAccountId: string;
 
-  @ManyToOne(() => UserAccount, (user) => user.paymentProfiles, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'userAccountId' })
+  @ManyToOne(() => UserAccount, (user) => user.paymentProfiles, {
+    onDelete: "CASCADE",
+  })
+  @JoinColumn({ name: "userAccountId" })
   userAccount: UserAccount;
 
   @Column()

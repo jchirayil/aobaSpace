@@ -16,6 +16,11 @@
       "type": "link"
     },
     {
+      "name": "Pricing",
+      "href": "/pricing",
+      "type": "link"
+    },
+    {
       "name": "Your Account",
       "type": "dropdown",
       "children": [

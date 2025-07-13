@@ -1,11 +1,15 @@
-import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common'; // NEW: Import NotFoundException
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { UserAccount } from './entities/user_account.entity'; // NEW
-import { UserProfile } from './entities/user_profile.entity'; // NEW
-import { UserPassword } from './entities/user_password.entity'; // NEW
-import { generateUniqueId } from '../common/utils'; // NEW: Import ID generator
-import * as bcrypt from 'bcryptjs'; // NEW: Import bcrypt for password hashing
+import {
+  Injectable,
+  UnauthorizedException,
+  NotFoundException,
+} from "@nestjs/common"; // NEW: Import NotFoundException
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { UserAccount } from "./entities/user-account.entity"; // NEW
+import { UserProfile } from "./entities/user-profile.entity"; // NEW
+import { UserPassword } from "./entities/user-password.entity"; // NEW
+import { generateUniqueId } from "../common/utils"; // NEW: Import ID generator
+import * as bcrypt from "bcryptjs"; // NEW: Import bcrypt for password hashing
 
 @Injectable()
 export class UsersService {
@@ -15,11 +19,13 @@ export class UsersService {
     @InjectRepository(UserProfile)
     private userProfileRepository: Repository<UserProfile>,
     @InjectRepository(UserPassword)
-    private userPasswordRepository: Repository<UserPassword>,
+    private userPasswordRepository: Repository<UserPassword>
   ) {}
 
   // --- UserAccount Operations ---
-  async createUserAccount(userData: Partial<UserAccount>): Promise<UserAccount> {
+  async createUserAccount(
+    userData: Partial<UserAccount>
+  ): Promise<UserAccount> {
     const userAccountId = generateUniqueId(); // Generate fixed-length ID without prefix
     const newUserAccount = this.userAccountRepository.create({
       id: userAccountId,
@@ -33,12 +39,19 @@ export class UsersService {
     return this.userAccountRepository.findOne({ where: { id } });
   }
 
-  async findUserAccountByUsername(username: string): Promise<UserAccount | undefined> {
+  async findUserAccountByUsername(
+    username: string
+  ): Promise<UserAccount | undefined> {
     return this.userAccountRepository.findOne({ where: { username } });
   }
 
-  async findOrCreateUserAccountBySso(ssoProvider: string, ssoId: string): Promise<UserAccount> {
-    let userAccount = await this.userAccountRepository.findOne({ where: { ssoProvider, ssoId } });
+  async findOrCreateUserAccountBySso(
+    ssoProvider: string,
+    ssoId: string
+  ): Promise<UserAccount> {
+    let userAccount = await this.userAccountRepository.findOne({
+      where: { ssoProvider, ssoId },
+    });
     if (!userAccount) {
       const userAccountId = generateUniqueId(); // Generate fixed-length ID without prefix
       userAccount = this.userAccountRepository.create({
@@ -56,27 +69,38 @@ export class UsersService {
   }
 
   // --- UserProfile Operations ---
-  async createUserProfile(profileData: Partial<UserProfile>): Promise<UserProfile> {
+  async createUserProfile(
+    profileData: Partial<UserProfile>
+  ): Promise<UserProfile> {
     const newUserProfile = this.userProfileRepository.create(profileData);
     return this.userProfileRepository.save(newUserProfile);
   }
 
-  async findUserProfileByAccountId(userAccountId: string): Promise<UserProfile | undefined> {
+  async findUserProfileByAccountId(
+    userAccountId: string
+  ): Promise<UserProfile | undefined> {
     return this.userProfileRepository.findOne({ where: { userAccountId } });
   }
 
-  async updateUserProfile(userAccountId: string, updateData: Partial<UserProfile>): Promise<UserProfile | undefined> {
+  async updateUserProfile(
+    userAccountId: string,
+    updateData: Partial<UserProfile>
+  ): Promise<UserProfile | undefined> {
     await this.userProfileRepository.update({ userAccountId }, updateData);
     return this.findUserProfileByAccountId(userAccountId);
   }
 
   // --- UserPassword Operations ---
-  async createUserPassword(passwordData: Partial<UserPassword>): Promise<UserPassword> {
+  async createUserPassword(
+    passwordData: Partial<UserPassword>
+  ): Promise<UserPassword> {
     const newUserPassword = this.userPasswordRepository.create(passwordData);
     return this.userPasswordRepository.save(newUserPassword);
   }
 
-  async findUserPasswordByAccountId(userAccountId: string): Promise<UserPassword | undefined> {
+  async findUserPasswordByAccountId(
+    userAccountId: string
+  ): Promise<UserPassword | undefined> {
     return this.userPasswordRepository.findOne({ where: { userAccountId } });
   }
 
@@ -88,21 +112,33 @@ export class UsersService {
    * @returns The updated UserPassword entity or undefined if not found/invalid.
    * @throws UnauthorizedException if old password does not match.
    */
-  async updateUserPassword(userAccountId: string, oldPassword: string, newPassword: string): Promise<UserPassword | undefined> {
+  async updateUserPassword(
+    userAccountId: string,
+    oldPassword: string,
+    newPassword: string
+  ): Promise<UserPassword | undefined> {
     const userPassword = await this.findUserPasswordByAccountId(userAccountId);
 
     if (!userPassword || !userPassword.hashedPassword) {
-      throw new UnauthorizedException('Password not set for this account or invalid user.');
+      throw new UnauthorizedException(
+        "Password not set for this account or invalid user."
+      );
     }
 
-    const isOldPasswordValid = await bcrypt.compare(oldPassword, userPassword.hashedPassword);
+    const isOldPasswordValid = await bcrypt.compare(
+      oldPassword,
+      userPassword.hashedPassword
+    );
 
     if (!isOldPasswordValid) {
-      throw new UnauthorizedException('Old password does not match.');
+      throw new UnauthorizedException("Old password does not match.");
     }
 
     const newHashedPassword = await bcrypt.hash(newPassword, 10); // Hash with salt rounds = 10
-    await this.userPasswordRepository.update({ userAccountId }, { hashedPassword: newHashedPassword });
+    await this.userPasswordRepository.update(
+      { userAccountId },
+      { hashedPassword: newHashedPassword }
+    );
     return this.findUserPasswordByAccountId(userAccountId);
   }
 
@@ -112,21 +148,31 @@ export class UsersService {
    * @param userAccountId The ID of the user account.
    * @returns A message indicating the action.
    */
-  async forceUserPasswordReset(userAccountId: string): Promise<{ message: string }> {
+  async forceUserPasswordReset(
+    userAccountId: string
+  ): Promise<{ message: string }> {
     const userAccount = await this.findUserAccountById(userAccountId);
     if (!userAccount) {
       throw new NotFoundException(`User with ID "${userAccountId}" not found.`);
     }
     // Dummy implementation: In a real app, generate a token, save it, and send an email.
-    console.log(`[DUMMY] Password reset link sent to ${userAccount.email} for user ID: ${userAccountId}`);
-    return { message: `Password reset link simulated sent to ${userAccount.email}.` };
+    console.log(
+      `[DUMMY] Password reset link sent to ${userAccount.email} for user ID: ${userAccountId}`
+    );
+    return {
+      message: `Password reset link simulated sent to ${userAccount.email}.`,
+    };
   }
 
   // --- Combined User Data Retrieval (for profile page) ---
   async getFullUserProfile(userAccountId: string): Promise<any> {
     const userAccount = await this.userAccountRepository.findOne({
       where: { id: userAccountId },
-      relations: ['profile', 'userOrganizations', 'userOrganizations.organization'], // Eager load profile and organizations
+      relations: [
+        "profile",
+        "userOrganizations",
+        "userOrganizations.organization",
+      ], // Eager load profile and organizations
     });
 
     if (!userAccount) {
@@ -134,14 +180,13 @@ export class UsersService {
     }
 
     // Map userOrganizations to include organization details and user's role
-    const organizations = userAccount.userOrganizations.map(uo => ({
+    const organizations = userAccount.userOrganizations.map((uo) => ({
       id: uo.organization.id,
       name: uo.organization.name,
       description: uo.organization.description,
       role: uo.role,
       isActive: uo.isActive,
     }));
-
 
     return {
       id: userAccount.id,
@@ -176,7 +221,7 @@ export class UsersService {
   async findUserByEmail(email: string): Promise<Partial<UserAccount>> {
     const userAccount = await this.userAccountRepository.findOne({
       where: { email },
-      relations: ['profile'],
+      relations: ["profile"],
     });
 
     if (!userAccount) {

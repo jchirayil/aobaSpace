@@ -7,10 +7,10 @@ import {
   OneToOne,
   OneToMany,
 } from "typeorm"; // Removed JoinColumn from here
-import { UserProfile } from "./user_profile.entity"; // NEW: Import UserProfile
-import { UserPassword } from "./user_password.entity"; // NEW: Import UserPassword
-import { UserOrganization } from "./user_organization.entity"; // NEW: Import UserOrganization
-import { PaymentProfile } from "../../billing/entities/payment_profile.entity";
+import { UserProfile } from "./user-profile.entity"; // NEW: Import UserProfile
+import { UserPassword } from "./user-password.entity"; // NEW: Import UserPassword
+import { UserOrganization } from "./user-organization.entity"; // NEW: Import UserOrganization
+import { PaymentProfile } from "../../billing/entities/payment-profile.entity";
 
 @Entity("user_accounts")
 export class UserAccount {

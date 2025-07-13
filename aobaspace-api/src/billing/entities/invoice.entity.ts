@@ -7,55 +7,55 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
-} from 'typeorm';
-import { Organization } from '../../users/entities/organization.entity';
-import { Subscription } from './subscription.entity';
-import { InvoiceLineItem } from './invoice_line_item.entity';
+} from "typeorm";
+import { Organization } from "../../organizations/entities/organization.entity";
+import { Subscription } from "./subscription.entity";
+import { InvoiceLineItem } from "./invoice-line-item.entity";
 
 export enum InvoiceStatus {
-  DRAFT = 'draft',
-  OPEN = 'open',
-  PAID = 'paid',
-  UNCOLLECTIBLE = 'uncollectible',
-  VOID = 'void',
+  DRAFT = "draft",
+  OPEN = "open",
+  PAID = "paid",
+  UNCOLLECTIBLE = "uncollectible",
+  VOID = "void",
 }
 
-@Entity('invoices')
+@Entity("invoices")
 export class Invoice {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @Column()
   organizationId: string;
 
   @ManyToOne(() => Organization)
-  @JoinColumn({ name: 'organizationId' })
+  @JoinColumn({ name: "organizationId" })
   organization: Organization;
 
   @Column({ nullable: true })
   subscriptionId: string;
 
   @ManyToOne(() => Subscription)
-  @JoinColumn({ name: 'subscriptionId' })
+  @JoinColumn({ name: "subscriptionId" })
   subscription: Subscription;
 
   @Column({
-    type: 'enum',
+    type: "enum",
     enum: InvoiceStatus,
     default: InvoiceStatus.DRAFT,
   })
   status: InvoiceStatus;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({ type: "decimal", precision: 10, scale: 2 })
   amountDue: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.0 })
+  @Column({ type: "decimal", precision: 10, scale: 2, default: 0.0 })
   amountPaid: number;
 
-  @Column({ type: 'timestamp with time zone' })
+  @Column({ type: "timestamp with time zone" })
   dueDate: Date;
 
-  @Column({ type: 'timestamp with time zone', nullable: true })
+  @Column({ type: "timestamp with time zone", nullable: true })
   paidAt: Date;
 
   @Column({ nullable: true })
@@ -64,7 +64,10 @@ export class Invoice {
   @Column({ nullable: true })
   transactionId: string; // e.g., Stripe charge ID
 
-  @OneToMany(() => InvoiceLineItem, (lineItem) => lineItem.invoice, { cascade: true, eager: true })
+  @OneToMany(() => InvoiceLineItem, (lineItem) => lineItem.invoice, {
+    cascade: true,
+    eager: true,
+  })
   lineItems: InvoiceLineItem[];
 
   @CreateDateColumn()
@@ -73,4 +76,3 @@ export class Invoice {
   @UpdateDateColumn()
   updatedAt: Date;
 }
-

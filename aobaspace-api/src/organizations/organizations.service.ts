@@ -1,11 +1,19 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common'; // NEW: Import UnauthorizedException
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm'; // Corrected '=' to 'from'
-import { Organization } from '../users/entities/organization.entity'; // Import Organization entity
-import { UserOrganization } from '../users/entities/user_organization.entity'; // Import UserOrganization entity
-import { UserAccount } from '../users/entities/user_account.entity'; // NEW: Import UserAccount
-import { CreateOrganizationDto, UpdateOrganizationDto, AddUserToOrganizationDto } from '../users/dto/user.dto'; // Import DTOs
-import { generateUniqueId } from '../common/utils'; // Import ID generator
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from "@nestjs/common"; // NEW: Import UnauthorizedException
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm"; // Corrected '=' to 'from'
+import { Organization } from "./entities/organization.entity"; // Import Organization entity
+import { UserOrganization } from "../users/entities/user-organization.entity"; // Import UserOrganization entity
+import { UserAccount } from "../users/entities/user-account.entity"; // NEW: Import UserAccount
+import {
+  CreateOrganizationDto,
+  UpdateOrganizationDto,
+  AddUserToOrganizationDto,
+} from "../users/dto/user.dto"; // Import DTOs
+import { generateUniqueId } from "../common/utils"; // Import ID generator
 
 @Injectable()
 export class OrganizationsService {
@@ -13,10 +21,12 @@ export class OrganizationsService {
     @InjectRepository(Organization)
     private organizationRepository: Repository<Organization>,
     @InjectRepository(UserOrganization)
-    private userOrganizationRepository: Repository<UserOrganization>,
+    private userOrganizationRepository: Repository<UserOrganization>
   ) {}
 
-  async createOrganization(createOrganizationDto: CreateOrganizationDto): Promise<Organization> {
+  async createOrganization(
+    createOrganizationDto: CreateOrganizationDto
+  ): Promise<Organization> {
     const organizationId = generateUniqueId(); // Generate fixed-length ID without prefix
     const newOrganization = this.organizationRepository.create({
       id: organizationId,
@@ -33,7 +43,10 @@ export class OrganizationsService {
     return this.organizationRepository.findOne({ where: { id } });
   }
 
-  async updateOrganization(id: string, updateOrganizationDto: UpdateOrganizationDto): Promise<Organization> {
+  async updateOrganization(
+    id: string,
+    updateOrganizationDto: UpdateOrganizationDto
+  ): Promise<Organization> {
     const organization = await this.findOrganizationById(id);
     if (!organization) {
       throw new NotFoundException(`Organization with ID "${id}" not found`);
@@ -49,7 +62,11 @@ export class OrganizationsService {
     }
   }
 
-  async addUserToOrganization(userAccountId: string, organizationId: string, role: string): Promise<UserOrganization> {
+  async addUserToOrganization(
+    userAccountId: string,
+    organizationId: string,
+    role: string
+  ): Promise<UserOrganization> {
     // Check if the user is already in the organization
     const existingUserOrg = await this.userOrganizationRepository.findOne({
       where: { userAccountId, organizationId },
@@ -57,7 +74,9 @@ export class OrganizationsService {
 
     if (existingUserOrg) {
       if (existingUserOrg.isActive) {
-        throw new UnauthorizedException('User is already an active member of this organization.');
+        throw new UnauthorizedException(
+          "User is already an active member of this organization."
+        );
       } else {
         // If user was previously inactive, reactivate them and update role
         existingUserOrg.isActive = true;
@@ -75,33 +94,42 @@ export class OrganizationsService {
     return this.userOrganizationRepository.save(userOrg);
   }
 
-  async removeUserFromOrganization(userAccountId: string, organizationId: string): Promise<void> {
+  async removeUserFromOrganization(
+    userAccountId: string,
+    organizationId: string
+  ): Promise<void> {
     // Instead of hard delete, we can set isActive to false
     const result = await this.userOrganizationRepository.update(
       { userAccountId, organizationId },
       { isActive: false, disabledOnDate: new Date() }
     );
     if (result.affected === 0) {
-      throw new NotFoundException(`User ${userAccountId} not found or not active in organization ${organizationId}`);
+      throw new NotFoundException(
+        `User ${userAccountId} not found or not active in organization ${organizationId}`
+      );
     }
   }
 
-  async findOrganizationsForUser(userAccountId: string): Promise<Organization[]> {
+  async findOrganizationsForUser(
+    userAccountId: string
+  ): Promise<Organization[]> {
     const userOrgs = await this.userOrganizationRepository.find({
       where: { userAccountId, isActive: true },
-      relations: ['organization'], // Load the related Organization entity
+      relations: ["organization"], // Load the related Organization entity
     });
-    return userOrgs.map(userOrg => userOrg.organization);
+    return userOrgs.map((userOrg) => userOrg.organization);
   }
 
-  async findPersonalOrganizationForUser(userAccountId: string): Promise<Organization | undefined> {
+  async findPersonalOrganizationForUser(
+    userAccountId: string
+  ): Promise<Organization | undefined> {
     const userOrgs = await this.userOrganizationRepository.findOne({
-      where: { userAccountId, role: 'admin', isActive: true }, // Assuming 'admin' for personal org
-      relations: ['organization'],
+      where: { userAccountId, role: "admin", isActive: true }, // Assuming 'admin' for personal org
+      relations: ["organization"],
     });
     // Check if the organization name is consistent with a personal org (e.g., ends with 's Personal Org')
     // This is a heuristic; a dedicated flag on the Organization entity would be more robust.
-    if (userOrgs && userOrgs.organization.name.includes('Personal Org')) {
+    if (userOrgs && userOrgs.organization.name.includes("Personal Org")) {
       return userOrgs.organization;
     }
     return undefined;
@@ -115,14 +143,14 @@ export class OrganizationsService {
   async findUsersInOrganization(organizationId: string): Promise<any[]> {
     const userOrganizations = await this.userOrganizationRepository.find({
       where: { organizationId, isActive: true },
-      relations: ['userAccount', 'userAccount.profile'], // Eager load user account and profile
+      relations: ["userAccount", "userAccount.profile"], // Eager load user account and profile
     });
 
     if (!userOrganizations || userOrganizations.length === 0) {
       return [];
     }
 
-    return userOrganizations.map(uo => ({
+    return userOrganizations.map((uo) => ({
       id: uo.userAccount.id,
       username: uo.userAccount.username,
       email: uo.userAccount.email,
@@ -142,13 +170,19 @@ export class OrganizationsService {
    * @returns The updated UserOrganization entity.
    * @throws NotFoundException if the user is not found in the organization.
    */
-  async updateUserOrganizationRole(organizationId: string, userAccountId: string, newRole: string): Promise<UserOrganization> {
+  async updateUserOrganizationRole(
+    organizationId: string,
+    userAccountId: string,
+    newRole: string
+  ): Promise<UserOrganization> {
     const userOrg = await this.userOrganizationRepository.findOne({
       where: { organizationId, userAccountId, isActive: true },
     });
 
     if (!userOrg) {
-      throw new NotFoundException(`User ${userAccountId} not found or not active in organization ${organizationId}`);
+      throw new NotFoundException(
+        `User ${userAccountId} not found or not active in organization ${organizationId}`
+      );
     }
 
     userOrg.role = newRole;
