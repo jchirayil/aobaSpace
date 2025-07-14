@@ -5,19 +5,26 @@ import { Plan } from "@/types/plan";
 
 // Helper function to fetch plans with error handling
 async function getPlans(): Promise<Plan[]> {
+  console.log("--- [Server] getPlans(): Attempting to fetch plans from API...");
   try {
-    const res = await fetch(`${API_BASE_URL}/plans`, {
-      // Revalidate every hour to fetch fresh plan data without a full rebuild
-      next: { revalidate: 3600 },
-    });
+    // Force dynamic rendering by opting out of the data cache.
+    // This ensures the fetch runs on every request, not at build time.
+    const res = await fetch(`${API_BASE_URL}/plans`, { cache: 'no-store' });
+
+    console.log(`--- [Server] getPlans(): API response status: ${res.status}`);
 
     if (!res.ok) {
-      throw new Error("Failed to fetch pricing plans");
+      throw new Error(`Failed to fetch pricing plans. Status: ${res.status} ${res.statusText}`);
     }
 
-    return res.json();
+    // IMPORTANT: You can only read the body once.
+    // Read it into a variable, log it, then return it.
+    const plansData = await res.json();
+    console.log("--- [Server] getPlans(): Successfully fetched and parsed plans data:", plansData);
+
+    return plansData;
   } catch (error) {
-    console.error("Error fetching plans:", error);
+    console.error("--- [Server] getPlans(): An error occurred:", error);
     return []; // Return an empty array on error so the page can still render
   }
 }
@@ -25,12 +32,16 @@ async function getPlans(): Promise<Plan[]> {
 export default async function PricingPage() {
   // Fetch data from both sources in parallel for best performance
   const plansData = getPlans();
-  const markdownData = getMarkdownPageContent("pricing");
+  const markdownData = getMarkdownPageContent("pricing-plan"); // Assuming you are using pricing-plan.md
+
+  console.log("--- [Server] PricingPage: Kicked off data fetching for plans and markdown.");
 
   const [plans, { data, sections }] = await Promise.all([
     plansData,
     markdownData,
   ]);
+
+  console.log(`--- [Server] PricingPage: Data fetching complete. Found ${plans.length} plans.`);
 
   return (
     <PricingPageClientContent

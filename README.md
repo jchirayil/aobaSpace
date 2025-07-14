@@ -38,6 +38,9 @@ Before you begin, ensure you have the following installed:
     * **`aobaspace-web/.env`**:
         ```env
         NEXT_PUBLIC_API_URL=http://localhost:3000/api
+        # This URL is used for server-side rendering within the Docker network.
+        # 'aobaspace-api' is the service name from docker-compose.yml.
+        API_URL_SERVER=http://aobaspace-api:3000/api
         ```
 
     * **`aobaspace-api/.env`**:

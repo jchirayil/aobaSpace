@@ -25,6 +25,9 @@ async function bootstrap() {
     credentials: true,
   });
 
+  // Set a global prefix for all routes to be /api
+  app.setGlobalPrefix('api');
+
   // Enable global validation pipes for DTOs
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
@@ -33,6 +36,6 @@ async function bootstrap() {
   }));
 
   await app.listen(appPort);
-  console.log(`AobaSpace API is running on: http://localhost:${appPort}`);
+  console.log(`AobaSpace API is running on: http://localhost:${appPort}/api`);
 }
 bootstrap();

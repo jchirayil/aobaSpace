@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Param, Put, Delete, NotFoundException, Una
 import { OrganizationsService } from './organizations.service';
 import { CreateOrganizationDto, UpdateOrganizationDto, AddUserToOrganizationDto, UpdateUserOrganizationRoleDto } from '../users/dto/user.dto'; // Import DTOs, NEW: UpdateUserOrganizationRoleDto
 
-@Controller('api/organizations')
+@Controller('organizations')
 export class OrganizationsController {
   constructor(private readonly organizationsService: OrganizationsService) {}
 

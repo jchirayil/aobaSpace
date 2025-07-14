@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { Response } from 'express'; // Import Response from express
 import { ConfigService } from '@nestjs/config'; // Import ConfigService
 
-@Controller('api/auth')
+@Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,

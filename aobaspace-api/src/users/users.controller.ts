@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Param, Put, Delete, NotFoundException, Una
 import { UsersService } from './users.service';
 import { CreateUserAccountDto, UpdateUserProfileDto, UpdateUserPasswordDto, FindUserByEmailDto } from './dto/user.dto'; // NEW: Import DTOs
 
-@Controller('api/users')
+@Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 

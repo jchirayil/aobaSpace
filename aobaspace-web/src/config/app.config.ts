@@ -1,18 +1,14 @@
-// This file centralizes configuration constants for the AobaSpace web frontend.
-// Environment variables prefixed with NEXT_PUBLIC_ are automatically exposed
-// to the browser by Next.js.
+// This file intelligently determines the correct API base URL to use,
+// whether the code is running on the server (during SSR/RSC) or on the client.
 
-/**
- * The base URL for the AobaSpace API backend.
- * This should be configured in a .env file (e.g., .env.local) as NEXT_PUBLIC_API_URL.
- * During local development, it typically points to http://localhost:3000/api.
- * In production, it would be your deployed API endpoint.
- */
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+// This is the URL used by the browser. It must be accessible from the user's machine.
+const API_URL_CLIENT = process.env.NEXT_PUBLIC_API_URL;
 
-/**
- * The port on which the AobaSpace web frontend runs during local development.
- * This is primarily for logging and informational purposes within the frontend code,
- * as Next.js's dev server handles the actual port binding.
- */
-export const FRONTEND_PORT = process.env.PORT || 3001; // Default to 3001 for frontend
+// This is the URL used by the Next.js server. It must use the internal Docker network hostname.
+const API_URL_SERVER = process.env.API_URL_SERVER;
+
+// Check if the code is running on the server or the client.
+const isServer = typeof window === 'undefined';
+
+// Export the appropriate URL.
+export const API_BASE_URL = isServer ? API_URL_SERVER : API_URL_CLIENT;
